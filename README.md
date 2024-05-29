@@ -1,8 +1,85 @@
-# MyBooks API
+## MyBooks API Documentation
 
-This project contains the API for the SaaS MyBooks, a project created to help users organize their personal library, by adding books, updating registered books, marking those that have been read, indicating if they are loaned out and to whom, and creating separate libraries to add books to.
+### Introduction
+Welcome to the documentation for the MyBooks API. MyBooks is a SaaS project designed to help users organize their personal library. This API provides endpoints for managing libraries, books, user profiles, billing, loan status, and reading status.
 
-## Features
+### Authentication
+Authentication is required for most endpoints. MyBooks supports email/password authentication and authentication via Google account.
+
+#### Endpoints:
+- `/login`: Authenticate using email and password.
+- `/login/google`: Authenticate using Google account.
+- `/forgot-password`: Recover password using email.
+- `/register`: Create a new account (requires email, name, and password).
+
+### Libraries
+Manage libraries where users can organize their books.
+
+#### Endpoints:
+- `GET /libraries`: Get all libraries.
+- `POST /libraries`: Create a new library.
+- `PUT /libraries/{libraryId}`: Update a library.
+- `DELETE /libraries/{libraryId}`: Delete a library.
+- `POST /libraries/{libraryId}/books`: Add books to a library.
+
+### Books
+Manage books within libraries.
+
+#### Endpoints:
+- `GET /books`: Get all books.
+- `POST /books`: Create a new book.
+- `PUT /books/{bookId}`: Update a book.
+- `DELETE /books/{bookId}`: Delete a book.
+
+### Profile
+Manage user profiles.
+
+#### Endpoints:
+- `PUT /profile/photo`: Update profile photo.
+- `PUT /profile`: Update name, email, and password.
+- `DELETE /profile`: Delete the account.
+
+### Billing
+Manage billing details and subscription plans.
+
+#### Endpoints:
+- `GET /billing`: Get billing details for the account ($5 per account).
+- `POST /subscribe`: Subscribe to a plan.
+
+### Loan
+Manage loan status of books.
+
+#### Endpoints:
+- `PUT /books/{bookId}/loan`: Mark a book as loaned and indicate to whom.
+- `PUT /books/{bookId}/return`: Mark a book as returned.
+
+### Reading Status
+Manage reading status of books.
+
+#### Endpoints:
+- `PUT /books/{bookId}/read`: Mark a book as read.
+- `DELETE /books/{bookId}/read`: Remove the reading status from a book.
+
+### Running Locally
+To run the service locally, you can use [Air](https://github.com/cosmtrek/air) for hot-reloading. Run the following command:
+```
+air
+```
+
+### Running in Production with Docker
+To run the service in a production environment using Docker, follow these steps:
+1. Build the Docker image:
+```
+docker build --tag mybooks .
+```
+2. Run the Docker container, mapping port 8080 on your local machine to port 8080 in the container:
+```
+docker run -p 8080:8080 mybooks
+```
+
+Now you should have the MyBooks API service up and running locally or in a production environment.
+
+## Features roadmap
 
 ### Authentication
 

@@ -9,7 +9,6 @@ import (
 )
 
 func StartServer() error {
-	// Create a new Echo instance
 	e := echo.New()
 
 	// Middleware

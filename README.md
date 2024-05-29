@@ -96,9 +96,9 @@ Now you should have the MyBooks API service up and running locally or in a produ
 
 - [x] Should be able to create a new book;
 - [x] Should be able to get all books;
-- [ ] Should be able to get book by id;
+- [X] Should be able to get book by id;
 - [ ] Should be able to update a book;
-- [ ] Should be able to delete a book;
+- [X] Should be able to delete a book;
 
 ### Profile
 

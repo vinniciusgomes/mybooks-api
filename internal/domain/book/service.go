@@ -4,6 +4,7 @@ import (
 	"mybooks/internal/infrastructure/model"
 	"mybooks/internal/infrastructure/utils"
 	"net/http"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -65,4 +66,49 @@ func (s *BookService) GetAllBooks(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, books)
+}
+
+// GetBookById retrieves a book by its ID from the BookService.
+//
+// It takes an echo.Context parameter which represents the HTTP request context.
+// The parameter "bookId" is extracted from the request path.
+// It returns an error if there was an issue retrieving the book from the BookRepository.
+// If the book is not found, it returns a JSON response with a status code of 404.
+// If there was an issue retrieving the book, it returns a JSON response with a status code of 500.
+// If the book is found, it returns a JSON response with the retrieved book and a status code of 200.
+func (s *BookService) GetBookById(c echo.Context) error {
+	id := c.Param("bookId")
+
+	book, err := s.repo.GetBookById(id)
+	if err != nil {
+		if strings.Contains(err.Error(), "book not found") {
+			return utils.HandleError(c, err, http.StatusNotFound)
+		}
+
+		return utils.HandleError(c, err, http.StatusInternalServerError)
+	}
+
+	return c.JSON(http.StatusOK, book)
+}
+
+// DeleteBook deletes a book by its ID from the BookService.
+//
+// It takes an echo.Context parameter which represents the HTTP request context.
+// The parameter "bookId" is extracted from the request path.
+// It returns an error if there was an issue deleting the book from the BookRepository.
+// If the book is not found, it returns a JSON response with a status code of 404.
+// If there was an issue deleting the book, it returns a JSON response with a status code of 500.
+// If the book is deleted successfully, it returns a JSON response with a status code of 200.
+func (s *BookService) DeleteBook(c echo.Context) error {
+	id := c.Param("bookId")
+
+	if err := s.repo.DeleteBook(id); err != nil {
+		if strings.Contains(err.Error(), "book not found") {
+			return utils.HandleError(c, err, http.StatusNotFound)
+		}
+
+		return utils.HandleError(c, err, http.StatusInternalServerError)
+	}
+
+	return c.NoContent(http.StatusOK)
 }

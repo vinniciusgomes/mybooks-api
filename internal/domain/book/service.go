@@ -29,37 +29,21 @@ func (s *BookService) CreateBook(c echo.Context) error {
 
 	id, err := utils.GenerateRandomID()
 	if err != nil {
-		data := map[string]interface{}{
-			"message": err.Error(),
-		}
-
-		return c.JSON(http.StatusInternalServerError, data)
+		return utils.HandleError(c, err, http.StatusInternalServerError)
 	}
 
 	book.ID = id
 
 	if err := c.Bind(book); err != nil {
-		data := map[string]interface{}{
-			"message": err.Error(),
-		}
-
-		return c.JSON(http.StatusBadRequest, data)
+		return utils.HandleError(c, err, http.StatusBadRequest)
 	}
 
 	if err := utils.ValidateStruct(book); err != nil {
-		data := map[string]interface{}{
-			"message": err.Error(),
-		}
-
-		return c.JSON(http.StatusBadRequest, data)
+		return utils.HandleError(c, err, http.StatusUnprocessableEntity)
 	}
 
 	if err := s.repo.CreateBook(book); err != nil {
-		data := map[string]interface{}{
-			"message": err.Error(),
-		}
-
-		return c.JSON(http.StatusInternalServerError, data)
+		return utils.HandleError(c, err, http.StatusInternalServerError)
 	}
 
 	data := map[string]interface{}{
@@ -77,10 +61,7 @@ func (s *BookService) CreateBook(c echo.Context) error {
 func (s *BookService) GetAllBooks(c echo.Context) error {
 	books, err := s.repo.GetAllBooks()
 	if err != nil {
-		data := map[string]interface{}{
-			"message": err.Error(),
-		}
-		return c.JSON(http.StatusInternalServerError, data)
+		return utils.HandleError(c, err, http.StatusInternalServerError)
 	}
 
 	return c.JSON(http.StatusOK, books)

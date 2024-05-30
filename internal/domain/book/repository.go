@@ -20,6 +20,13 @@ type bookRepository struct {
 	db *gorm.DB
 }
 
+// NewBookRepository creates a new instance of BookRepository using the provided *gorm.DB.
+//
+// Parameters:
+// - db: The *gorm.DB object representing the database connection.
+//
+// Returns:
+// - BookRepository: The newly created instance of BookRepository.
 func NewBookRepository(db *gorm.DB) BookRepository {
 	return &bookRepository{
 		db: db,
@@ -60,6 +67,8 @@ func (r *bookRepository) GetAllBooks(filters map[string]interface{}) ([]model.Bo
 		}
 	}
 
+	query = query.Order("created_at DESC")
+
 	if err := query.Find(&books).Error; err != nil {
 		return nil, err
 	}
@@ -67,10 +76,14 @@ func (r *bookRepository) GetAllBooks(filters map[string]interface{}) ([]model.Bo
 	return books, nil
 }
 
-// GetBookById retrieves a book by its ID from the bookRepository.
+// GetBookById retrieves a book from the bookRepository by its ID.
 //
-// It takes a string parameter, which represents the ID of the book to retrieve.
-// It returns a model.Book object representing the retrieved book, and an error if there was an issue retrieving the book from the database.
+// Parameters:
+// - id: the ID of the book to retrieve.
+//
+// Returns:
+// - model.Book: the retrieved book.
+// - error: an error if the book was not found or there was an issue retrieving it.
 func (r *bookRepository) GetBookById(id string) (model.Book, error) {
 	var book model.Book
 	if err := r.db.Where("id = ?", id).First(&book).Error; err != nil {
@@ -116,7 +129,7 @@ func (r *bookRepository) UpdateBook(book *model.Book) error {
 		return err
 	}
 
-	if err := r.db.Model(&existingBook).Omit("ID", "CreatedAt").Save(book).Error; err != nil {
+	if err := r.db.Model(&existingBook).Omit("ID", "CreatedAt").Updates(book).Error; err != nil {
 		return err
 	}
 

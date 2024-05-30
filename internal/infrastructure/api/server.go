@@ -3,6 +3,7 @@ package api
 import (
 	"log"
 	"mybooks/internal/domain/book"
+	"mybooks/internal/domain/library"
 	"mybooks/internal/infrastructure/api/endpoints"
 	"mybooks/internal/infrastructure/config"
 	"net/http"
@@ -56,10 +57,11 @@ func StartServer() error {
 
 	// Services
 	bookService := book.NewBookService(book.NewBookRepository(config.DB()))
+	libraryService := library.NewLibraryService(library.NewLibraryRepository(config.DB()))
 
 	// Routes
 	endpoints.Authentication(e)
-	endpoints.Libraries(e)
+	endpoints.Libraries(e, libraryService)
 	endpoints.Books(e, bookService)
 	endpoints.Profile(e)
 	endpoints.Billing(e)

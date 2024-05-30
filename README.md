@@ -86,8 +86,9 @@ Now you should have the MyBooks API service up and running locally or in a produ
 
 ### Library
 
-- [ ] Should be able to create a new library;
-- [ ] Should be able to get all libraries;
+- [X] Should be able to create a new library;
+- [X] Should be able to get all libraries;
+- [X] Should be able to get a library by id;
 - [ ] Should be able to update a library;
 - [ ] Should be able to delete a library;
 - [ ] Should be able to add books in a library;

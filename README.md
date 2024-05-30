@@ -100,7 +100,7 @@ Now you should have the MyBooks API service up and running locally or in a produ
   - [X] Should be able to filter books by title
   - [X] Should be able to filter books by author
   - [X] Should be able to filter books by genre
-  - [X] Should be able to filter books by isbn
+  - [X] Should be able to filter books by ISBN
   - [X] Should be able to filter books by language
   - [X] Should be able to filter books by read
 - [X] Should be able to get book by id;

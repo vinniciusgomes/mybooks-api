@@ -112,3 +112,31 @@ func (s *BookService) DeleteBook(c echo.Context) error {
 
 	return c.NoContent(http.StatusOK)
 }
+
+// UpdateBook updates a book in the BookService.
+//
+// It takes an echo.Context parameter which represents the HTTP request context.
+// The parameter "bookId" is extracted from the request path.
+// It returns an error if there was an issue updating the book in the BookRepository.
+// If the book is not found, it returns a JSON response with a status code of 404.
+// If there was an issue updating the book, it returns a JSON response with a status code of 500.
+// If the book is updated successfully, it returns a JSON response with a status code of 200.
+func (s *BookService) UpdateBook(c echo.Context) error {
+	id := c.Param("bookId")
+
+	var book model.Book
+	if err := c.Bind(&book); err != nil {
+		return utils.HandleError(c, err, http.StatusBadRequest)
+	}
+
+	book.ID = id
+
+	if err := s.repo.UpdateBook(&book); err != nil {
+		if strings.Contains(err.Error(), "book not found") {
+			return c.JSON(http.StatusNotFound, map[string]string{"error": err.Error()})
+		}
+		return utils.HandleError(c, err, http.StatusInternalServerError)
+	}
+
+	return c.NoContent(http.StatusOK)
+}

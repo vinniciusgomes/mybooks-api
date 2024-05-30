@@ -13,6 +13,7 @@ type BookRepository interface {
 	GetAllBooks() ([]model.Book, error)
 	GetBookById(id string) (model.Book, error)
 	DeleteBook(id string) error
+	UpdateBook(book *model.Book) error
 }
 
 type bookRepository struct {
@@ -85,4 +86,23 @@ func (r *bookRepository) DeleteBook(id string) error {
 	return r.db.Delete(&book).Error
 }
 
-// TODO: update book
+// UpdateBook updates a book in the bookRepository.
+//
+// It takes a pointer to a model.Book object as a parameter, which represents the book to be updated.
+// It returns an error if there was an issue updating the book in the database.
+// If the book is not found, it returns a "book not found" error.
+func (r *bookRepository) UpdateBook(book *model.Book) error {
+	var existingBook model.Book
+	if err := r.db.Where("id = ?", book.ID).First(&existingBook).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("book not found")
+		}
+		return err
+	}
+
+	if err := r.db.Model(&existingBook).Omit("ID", "CreatedAt").Save(book).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

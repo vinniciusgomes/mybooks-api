@@ -93,7 +93,7 @@ Now you should have the MyBooks API service up and running locally or in a produ
 - [ ] Should be able to delete a library;
 - [ ] Should be able to add books in a library;
 
-### Books
+### Books ✅
 
 - [x] Should be able to create a new book;
 - [x] Should be able to get all books;

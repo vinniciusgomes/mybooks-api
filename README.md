@@ -94,10 +94,18 @@ Now you should have the MyBooks API service up and running locally or in a produ
 
 ### Books
 
-- [ ] Should be able to create a new book;
-- [ ] Should be able to get all books;
-- [ ] Should be able to update a book;
-- [ ] Should be able to delete a book;
+- [x] Should be able to create a new book;
+- [x] Should be able to get all books;
+- [x] Should be able to get all books with params;
+  - [X] Should be able to filter books by title
+  - [X] Should be able to filter books by author
+  - [X] Should be able to filter books by genre
+  - [X] Should be able to filter books by ISBN
+  - [X] Should be able to filter books by language
+  - [X] Should be able to filter books by read
+- [X] Should be able to get book by id;
+- [X] Should be able to update a book;
+- [X] Should be able to delete a book;
 
 ### Profile
 

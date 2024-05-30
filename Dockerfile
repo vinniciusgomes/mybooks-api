@@ -9,11 +9,11 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy the source code
-COPY cmd/api/*.go ./
+# Copy the entire project directory
+COPY . .
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping .
+RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping ./cmd/api
 
 # Optional:
 # To bind to a TCP port, runtime parameters must be supplied to the docker command.

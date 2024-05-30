@@ -4,6 +4,7 @@ import (
 	"mybooks/internal/infrastructure/model"
 	"mybooks/internal/infrastructure/utils"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -60,7 +61,27 @@ func (s *BookService) CreateBook(c echo.Context) error {
 // It returns an error if there was an issue retrieving the books from the BookRepository.
 // It returns a JSON response with the retrieved books if successful, or an error message if there was an issue.
 func (s *BookService) GetAllBooks(c echo.Context) error {
-	books, err := s.repo.GetAllBooks()
+	filters := make(map[string]interface{})
+
+	if title := strings.TrimSpace(c.QueryParam("title")); title != "" {
+		filters["title"] = title
+	} else if author := strings.TrimSpace(c.QueryParam("author")); author != "" {
+		filters["author"] = author
+	} else if genre := strings.TrimSpace(c.QueryParam("genre")); genre != "" {
+		filters["genre"] = genre
+	} else if isbn := strings.TrimSpace(c.QueryParam("isbn")); isbn != "" {
+		filters["isbn"] = isbn
+	} else if language := strings.TrimSpace(c.QueryParam("language")); language != "" {
+		filters["language"] = language
+	} else if read := strings.TrimSpace(c.QueryParam("read")); read != "" {
+		readBool, err := strconv.ParseBool(read)
+		if err != nil {
+			return utils.HandleError(c, err, http.StatusBadRequest)
+		}
+		filters["read"] = readBool
+	}
+
+	books, err := s.repo.GetAllBooks(filters)
 	if err != nil {
 		return utils.HandleError(c, err, http.StatusInternalServerError)
 	}

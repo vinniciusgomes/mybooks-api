@@ -13,6 +13,7 @@ type LibraryRepository interface {
 	CreateLibrary(library *model.Library) error
 	GetAllLibraries() ([]model.Library, error)
 	GetLibraryByID(id string) (*model.Library, error)
+	UpdateLibrary(library *model.Library) error
 	DeleteLibrary(id string) error
 	AddBookToLibrary(libraryID string, bookID string) error
 }
@@ -98,6 +99,30 @@ func (r *libraryRepository) DeleteLibrary(id string) error {
 	}
 
 	return r.db.Delete(&library).Error
+}
+
+// UpdateLibrary updates an existing library in the libraryRepository.
+//
+// Parameters:
+// - library: A pointer to a model.Library object representing the library to be updated.
+//
+// Returns:
+//   - error: An error if there was an issue updating the library in the database.
+//     Returns nil if the library was successfully updated.
+func (r *libraryRepository) UpdateLibrary(library *model.Library) error {
+	var existingLibrary model.Library
+	if err := r.db.Where("id = ?", library.ID).First(&existingLibrary).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("library not found")
+		}
+		return err
+	}
+
+	if err := r.db.Model(&existingLibrary).Omit("ID", "CreatedAt").Updates(library).Error; err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // AddBookToLibrary adds a book to a library in the libraryRepository.

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -108,6 +109,39 @@ func (s *LibraryService) DeleteLibrary(c echo.Context) error {
 			return utils.HandleError(c, err, http.StatusNotFound)
 		}
 
+		return utils.HandleError(c, err, http.StatusInternalServerError)
+	}
+
+	return c.NoContent(http.StatusOK)
+}
+
+// UpdateLibrary updates a library in the LibraryService.
+//
+// Parameters:
+// - c: The echo.Context object representing the HTTP request and response.
+//
+// Returns:
+// - error: An error if there was a problem updating the library, otherwise nil.
+func (s *LibraryService) UpdateLibrary(c echo.Context) error {
+	id := c.Param("libraryId")
+
+	var library model.Library
+	if err := c.Bind(&library); err != nil {
+		return utils.HandleError(c, err, http.StatusBadRequest)
+	}
+
+	libraryID, err := uuid.Parse(id)
+	if err != nil {
+		return utils.HandleError(c, err, http.StatusBadRequest)
+	}
+
+	library.ID = libraryID
+
+	if err := utils.ValidateStruct(library); err != nil {
+		return utils.HandleError(c, err, http.StatusUnprocessableEntity)
+	}
+
+	if err := s.repo.UpdateLibrary(&library); err != nil {
 		return utils.HandleError(c, err, http.StatusInternalServerError)
 	}
 

@@ -18,5 +18,5 @@ func Libraries(e *echo.Echo, libraryService *library.LibraryService) {
 	e.POST("/v1/libraries", libraryService.CreateLibrary)
 	e.PUT("/v1/libraries/:libraryId", libraryService.UpdateLibrary)
 	e.DELETE("/v1/libraries/:libraryId", libraryService.DeleteLibrary)
-	e.POST("/v1/libraries/:libraryId/add-book", libraryService.AddBookToLibrary)
+	e.POST("/v1/libraries/:libraryId/books", libraryService.AddBookToLibrary)
 }

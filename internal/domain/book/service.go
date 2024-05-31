@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 )
 
@@ -64,15 +65,15 @@ func (s *BookService) GetAllBooks(c echo.Context) error {
 	filters := make(map[string]interface{})
 
 	if title := strings.TrimSpace(c.QueryParam("title")); title != "" {
-		filters["title"] = title
+		filters["title"] = strings.ToLower(title)
 	} else if author := strings.TrimSpace(c.QueryParam("author")); author != "" {
-		filters["author"] = author
+		filters["author"] = strings.ToLower(author)
 	} else if genre := strings.TrimSpace(c.QueryParam("genre")); genre != "" {
-		filters["genre"] = genre
+		filters["genre"] = strings.ToLower(genre)
 	} else if isbn := strings.TrimSpace(c.QueryParam("isbn")); isbn != "" {
 		filters["isbn"] = isbn
 	} else if language := strings.TrimSpace(c.QueryParam("language")); language != "" {
-		filters["language"] = language
+		filters["language"] = strings.ToLower(language)
 	} else if read := strings.TrimSpace(c.QueryParam("read")); read != "" {
 		readBool, err := strconv.ParseBool(read)
 		if err != nil {
@@ -150,7 +151,12 @@ func (s *BookService) UpdateBook(c echo.Context) error {
 		return utils.HandleError(c, err, http.StatusBadRequest)
 	}
 
-	book.ID = id
+	bookID, err := uuid.Parse(id)
+	if err != nil {
+		return utils.HandleError(c, err, http.StatusBadRequest)
+	}
+
+	book.ID = bookID
 
 	if err := s.repo.UpdateBook(&book); err != nil {
 		if strings.Contains(err.Error(), "book not found") {

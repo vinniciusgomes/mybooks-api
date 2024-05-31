@@ -20,10 +20,6 @@ func Libraries(e *echo.Echo, libraryService *library.LibraryService) {
 	e.PUT("/v1/libraries/:libraryId", func(c echo.Context) error {
 		return c.String(http.StatusOK, "PUT /libraries/:libraryId")
 	})
-	e.DELETE("/v1/libraries/:libraryId", func(c echo.Context) error {
-		return c.String(http.StatusOK, "DELETE /libraries/:libraryId")
-	})
-	e.POST("/v1/libraries/:libraryId/books", func(c echo.Context) error {
-		return c.String(http.StatusOK, "POST /libraries/:libraryId/books")
-	})
+	e.DELETE("/v1/libraries/:libraryId", libraryService.DeleteLibrary)
+	e.POST("/v1/libraries/:libraryId/add-book", libraryService.AddBookToLibrary)
 }

@@ -12,6 +12,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
+
+	_ "mybooks/docs"
 )
 
 // StartServer initializes the server and starts it.
@@ -68,9 +71,13 @@ func StartServer() error {
 	endpoints.Loan(e)
 	endpoints.Reading(e)
 
+	// Health check
 	e.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "OK")
 	})
+
+	// Swagger
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// Start server
 	httpPort := os.Getenv("PORT")

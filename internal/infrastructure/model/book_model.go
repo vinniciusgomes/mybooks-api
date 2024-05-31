@@ -18,7 +18,7 @@ type Book struct {
 	Language      string    `json:"language" gorm:"size:10" validate:"max=10"`
 	Pages         int       `json:"pages" gorm:"default:0" validate:"min=0"`
 	Read          bool      `json:"read" gorm:"default:false"`
-	Libraries     []Library `json:"libraries" gorm:"many2many:book_library;"`
+	Libraries     []Library `json:"-" gorm:"many2many:book_library;"`
 	CreatedAt     time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt     time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }

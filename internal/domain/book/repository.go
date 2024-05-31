@@ -57,7 +57,7 @@ func (r *bookRepository) CreateBook(book *model.Book) error {
 // the function returns nil and the error.
 func (r *bookRepository) GetAllBooks(filters map[string]interface{}) ([]model.Book, error) {
 	var books []model.Book
-	query := r.db.Model(&model.Book{})
+	query := r.db.Model(&model.Book{}).Omit("libraries")
 
 	for key, value := range filters {
 		if key == "read" {

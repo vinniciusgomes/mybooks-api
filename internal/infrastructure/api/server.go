@@ -3,6 +3,7 @@ package api
 import (
 	"log"
 	"mybooks/internal/domain/book"
+	"mybooks/internal/domain/library"
 	"mybooks/internal/infrastructure/api/endpoints"
 	"mybooks/internal/infrastructure/config"
 	"net/http"
@@ -11,6 +12,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	echoSwagger "github.com/swaggo/echo-swagger"
+
+	_ "mybooks/docs"
 )
 
 // StartServer initializes the server and starts it.
@@ -56,19 +60,24 @@ func StartServer() error {
 
 	// Services
 	bookService := book.NewBookService(book.NewBookRepository(config.DB()))
+	libraryService := library.NewLibraryService(library.NewLibraryRepository(config.DB()))
 
 	// Routes
 	endpoints.Authentication(e)
-	endpoints.Libraries(e)
+	endpoints.Libraries(e, libraryService)
 	endpoints.Books(e, bookService)
 	endpoints.Profile(e)
 	endpoints.Billing(e)
 	endpoints.Loan(e)
 	endpoints.Reading(e)
 
+	// Health check
 	e.GET("/health", func(c echo.Context) error {
 		return c.String(http.StatusOK, "OK")
 	})
+
+	// Swagger
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// Start server
 	httpPort := os.Getenv("PORT")

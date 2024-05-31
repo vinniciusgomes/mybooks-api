@@ -1,7 +1,7 @@
 package endpoints
 
 import (
-	"net/http"
+	"mybooks/internal/domain/library"
 
 	"github.com/labstack/echo/v4"
 )
@@ -12,20 +12,11 @@ import (
 // - e: The Echo instance to register the endpoints with.
 //
 // Return type: None.
-func Libraries(e *echo.Echo) {
-	e.GET("/libraries", func(c echo.Context) error {
-		return c.String(http.StatusOK, "GET /libraries")
-	})
-	e.POST("/libraries", func(c echo.Context) error {
-		return c.String(http.StatusOK, "POST /libraries")
-	})
-	e.PUT("/libraries/:libraryId", func(c echo.Context) error {
-		return c.String(http.StatusOK, "PUT /libraries/:libraryId")
-	})
-	e.DELETE("/libraries/:libraryId", func(c echo.Context) error {
-		return c.String(http.StatusOK, "DELETE /libraries/:libraryId")
-	})
-	e.POST("/libraries/:libraryId/books", func(c echo.Context) error {
-		return c.String(http.StatusOK, "POST /libraries/:libraryId/books")
-	})
+func Libraries(e *echo.Echo, libraryService *library.LibraryService) {
+	e.GET("/v1/libraries", libraryService.GetAllLibraries)
+	e.GET("/v1/libraries/:libraryId", libraryService.GetLibraryByID)
+	e.POST("/v1/libraries", libraryService.CreateLibrary)
+	e.PUT("/v1/libraries/:libraryId", libraryService.UpdateLibrary)
+	e.DELETE("/v1/libraries/:libraryId", libraryService.DeleteLibrary)
+	e.POST("/v1/libraries/:libraryId/books", libraryService.AddBookToLibrary)
 }

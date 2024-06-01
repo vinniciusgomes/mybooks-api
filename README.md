@@ -122,7 +122,7 @@ Now you should have the MyBooks API service up and running locally or in a produ
 - [ ] Should be able to get billing details for the account ($5 per account);
 - [ ] Should be able to subscribe to a plan;
 
-### Loan
+### Loan ✅
 
 - [X] Should be able to create a loan and indicate to whom;
 - [x] Should be able to get all loans;

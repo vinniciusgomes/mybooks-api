@@ -5,6 +5,7 @@ import (
 	"mybooks/internal/infrastructure/utils"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -16,6 +17,14 @@ type LibraryService struct {
 
 type AddBookRequest struct {
 	BookID string `json:"book_id"`
+}
+
+type LibraryResponse struct {
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 func NewLibraryService(repo LibraryRepository) *LibraryService {
@@ -64,7 +73,18 @@ func (s *LibraryService) GetAllLibraries(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, libraries)
+	response := make([]LibraryResponse, 0)
+	for _, library := range *libraries {
+		response = append(response, LibraryResponse{
+			ID:          library.ID,
+			Name:        library.Name,
+			Description: library.Description,
+			CreatedAt:   library.CreatedAt,
+			UpdatedAt:   library.UpdatedAt,
+		})
+	}
+
+	c.JSON(http.StatusOK, response)
 }
 
 func (s *LibraryService) GetLibraryByID(c *gin.Context) {

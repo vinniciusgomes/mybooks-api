@@ -1,7 +1,7 @@
 ## MyBooks API Documentation
 
 ### Introduction
-Welcome to the documentation for the MyBooks API. MyBooks is a SaaS project designed to help users organize their personal library. This API provides endpoints for managing libraries, books, user profiles, billing, loan status, and reading status.
+Welcome to the documentation for the MyBooks API. MyBooks is a SaaS project designed to help users organize their personal library. This API provides endpoints for managing libraries, books, user profiles, billing, and loan status.
 
 ### Authentication
 Authentication is required for most endpoints. MyBooks supports magic link authentication and authentication via Google account.
@@ -53,13 +53,6 @@ Manage loan status of books.
 - `POST v1/loans`: Create a loan
 - `GET v1/loans`: Get all loans
 - `PUT v1/loans/:loanId/return`: Mark loan as returned
-
-### Reading Status
-Manage reading status of books.
-
-#### Endpoints:
-- `PUT v1/books/{bookId}/read`: Mark a book as read.
-- `DELETE v1/books/{bookId}/read`: Remove the reading status from a book.
 
 ### Running Locally
 To run the service locally, you can use [Air](https://github.com/cosmtrek/air) for hot-reloading. Run the following command:
@@ -127,8 +120,3 @@ Now you should have the MyBooks API service up and running locally or in a produ
 - [X] Should be able to create a loan and indicate to whom;
 - [x] Should be able to get all loans;
 - [X] Should be able to mark a loan as returned;
-
-### Reading Status
-
-- [ ] Should be able to mark a book as read;
-- [ ] Should be able to remove the reading status from a book.

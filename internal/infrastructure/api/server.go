@@ -66,13 +66,9 @@ func StartServer() error {
 	loanService := loan.NewLoanService(loan.NewLoanRepository(config.DB()))
 
 	// Routes
-	endpoints.Authentication(r)
 	endpoints.Libraries(r, libraryService)
 	endpoints.Books(r, bookService)
 	endpoints.Loan(r, loanService)
-	endpoints.Reading(r)
-	endpoints.Profile(r)
-	endpoints.Billing(r)
 
 	// Health check
 	r.GET("/health", func(c *gin.Context) {

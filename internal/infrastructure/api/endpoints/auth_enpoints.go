@@ -3,20 +3,20 @@ package endpoints
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 )
 
-// Authentication registers the authentication-related API endpoints with the provided Echo instance.
+// Authentication registers the authentication-related API endpoints with the provided Gin engine.
 //
 // Parameters:
-// - e: The Echo instance to register the endpoints with.
+// - r: The Gin engine to register the endpoints with.
 //
 // Return type: None.
-func Authentication(e *echo.Echo) {
-	e.POST("/auth", func(c echo.Context) error {
-		return c.String(http.StatusOK, "POST /auth")
+func Authentication(r *gin.Engine) {
+	r.POST("/auth", func(c *gin.Context) {
+		c.String(http.StatusOK, "POST /auth")
 	})
-	e.POST("/auth/google", func(c echo.Context) error {
-		return c.String(http.StatusOK, "POST /auth/google")
+	r.POST("/auth/google", func(c *gin.Context) {
+		c.String(http.StatusOK, "POST /auth/google")
 	})
 }

@@ -21,12 +21,6 @@ func NewBookService(repo BookRepository) *BookService {
 	}
 }
 
-// CreateBook creates a new book in the BookService.
-//
-// It takes a gin.Context parameter which represents the HTTP request context.
-// It returns an error if there was an issue binding the request body to a model.Book object.
-// It returns an error if there was an issue creating the book in the BookRepository.
-// It returns nil if the book was successfully created.
 func (s *BookService) CreateBook(c *gin.Context) {
 	book := new(model.Book)
 
@@ -58,11 +52,6 @@ func (s *BookService) CreateBook(c *gin.Context) {
 	})
 }
 
-// GetAllBooks retrieves all books from the BookService.
-//
-// It takes a gin.Context parameter which represents the HTTP request context.
-// It returns an error if there was an issue retrieving the books from the BookRepository.
-// It returns a JSON response with the retrieved books if successful, or an error message if there was an issue.
 func (s *BookService) GetAllBooks(c *gin.Context) {
 	filters := make(map[string]interface{})
 
@@ -99,14 +88,6 @@ func (s *BookService) GetAllBooks(c *gin.Context) {
 	c.JSON(http.StatusOK, books)
 }
 
-// GetBookById retrieves a book by its ID from the BookService.
-//
-// It takes a gin.Context parameter which represents the HTTP request context.
-// The parameter "bookId" is extracted from the request path.
-// It returns an error if there was an issue retrieving the book from the BookRepository.
-// If the book is not found, it returns a JSON response with a status code of 404.
-// If there was an issue retrieving the book, it returns a JSON response with a status code of 500.
-// If the book is found, it returns a JSON response with the retrieved book and a status code of 200.
 func (s *BookService) GetBookById(c *gin.Context) {
 	id := c.Param("bookId")
 
@@ -123,14 +104,6 @@ func (s *BookService) GetBookById(c *gin.Context) {
 	c.JSON(http.StatusOK, book)
 }
 
-// DeleteBook deletes a book by its ID from the BookService.
-//
-// It takes a gin.Context parameter which represents the HTTP request context.
-// The parameter "bookId" is extracted from the request path.
-// It returns an error if there was an issue deleting the book from the BookRepository.
-// If the book is not found, it returns a JSON response with a status code of 404.
-// If there was an issue deleting the book, it returns a JSON response with a status code of 500.
-// If the book is deleted successfully, it returns a JSON response with a status code of 200.
 func (s *BookService) DeleteBook(c *gin.Context) {
 	id := c.Param("bookId")
 
@@ -146,14 +119,6 @@ func (s *BookService) DeleteBook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Book deleted successfully"})
 }
 
-// UpdateBook updates a book in the BookService.
-//
-// It takes a gin.Context parameter which represents the HTTP request context.
-// The parameter "bookId" is extracted from the request path.
-// It returns an error if there was an issue updating the book in the BookRepository.
-// If the book is not found, it returns a JSON response with a status code of 404.
-// If there was an issue updating the book, it returns a JSON response with a status code of 500.
-// If the book is updated successfully, it returns a JSON response with a status code of 200.
 func (s *BookService) UpdateBook(c *gin.Context) {
 	id := c.Param("bookId")
 

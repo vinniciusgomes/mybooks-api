@@ -6,13 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Books registers the book-related API endpoints with the provided Gin engine and book service.
-//
-// Parameters:
-// - r: The Gin engine to register the endpoints with.
-// - bookService: The book service to handle the book-related requests.
-//
-// Return type: None.
 func Books(r *gin.Engine, bookService *book.BookService) {
 	r.GET("/v1/books", bookService.GetAllBooks)
 	r.GET("/v1/books/:bookId", func(c *gin.Context) {

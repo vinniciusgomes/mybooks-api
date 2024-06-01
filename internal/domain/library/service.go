@@ -24,10 +24,6 @@ func NewLibraryService(repo LibraryRepository) *LibraryService {
 	}
 }
 
-// CreateLibrary creates a new library in the system.
-//
-// Parameters:
-// - c: The gin.Context object representing the HTTP request and response.
 func (s *LibraryService) CreateLibrary(c *gin.Context) {
 	library := new(model.Library)
 
@@ -61,10 +57,6 @@ func (s *LibraryService) CreateLibrary(c *gin.Context) {
 	c.JSON(http.StatusCreated, data)
 }
 
-// GetAllLibraries retrieves all libraries from the library service and returns them as a JSON response.
-//
-// Parameters:
-// - c: The gin.Context object representing the HTTP request and response.
 func (s *LibraryService) GetAllLibraries(c *gin.Context) {
 	libraries, err := s.repo.GetAllLibraries()
 	if err != nil {
@@ -75,10 +67,6 @@ func (s *LibraryService) GetAllLibraries(c *gin.Context) {
 	c.JSON(http.StatusOK, libraries)
 }
 
-// GetLibraryByID retrieves a library by its ID from the LibraryService.
-//
-// Parameters:
-// - c: The gin.Context object representing the HTTP request and response.
 func (s *LibraryService) GetLibraryByID(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 
@@ -91,10 +79,6 @@ func (s *LibraryService) GetLibraryByID(c *gin.Context) {
 	c.JSON(http.StatusOK, library)
 }
 
-// DeleteLibrary deletes a library from the LibraryService.
-//
-// Parameters:
-// - c: The gin.Context object representing the HTTP request and response.
 func (s *LibraryService) DeleteLibrary(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 
@@ -111,10 +95,6 @@ func (s *LibraryService) DeleteLibrary(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// UpdateLibrary updates a library in the LibraryService.
-//
-// Parameters:
-// - c: The gin.Context object representing the HTTP request and response.
 func (s *LibraryService) UpdateLibrary(c *gin.Context) {
 	id := c.Param("libraryId")
 
@@ -145,10 +125,6 @@ func (s *LibraryService) UpdateLibrary(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// AddBookToLibrary adds a book to a library in the LibraryService.
-//
-// Parameters:
-// - c: The gin.Context object representing the HTTP request and response.
 func (s *LibraryService) AddBookToLibrary(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 

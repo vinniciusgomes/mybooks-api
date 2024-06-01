@@ -50,8 +50,9 @@ Manage billing details and subscription plans.
 Manage loan status of books.
 
 #### Endpoints:
-- `PUT v1/books/{bookId}/loan`: Mark a book as loaned and indicate to whom.
-- `PUT v1/books/{bookId}/return`: Mark a book as returned.
+- `POST v1/loans`: Create a loan
+- `GET v1/loans`: Get all loans
+- `PUT /v1/loans/:loanId/return`: Mark loan as returned
 
 ### Reading Status
 Manage reading status of books.

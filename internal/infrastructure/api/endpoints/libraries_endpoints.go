@@ -6,12 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Libraries registers the library-related API endpoints with the provided Echo instance.
-//
-// Parameters:
-// - e: The Echo instance to register the endpoints with.
-//
-// Return type: None.
 func Libraries(r *gin.Engine, libraryService *library.LibraryService) {
 	r.GET("/v1/libraries", libraryService.GetAllLibraries)
 	r.GET("/v1/libraries/:libraryId", libraryService.GetLibraryByID)

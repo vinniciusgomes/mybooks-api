@@ -4,6 +4,7 @@ import (
 	"log"
 	"mybooks/internal/domain/book"
 	"mybooks/internal/domain/library"
+	"mybooks/internal/domain/loan"
 	"mybooks/internal/infrastructure/api/endpoints"
 	"mybooks/internal/infrastructure/api/middlewares"
 	"mybooks/internal/infrastructure/config"
@@ -62,15 +63,16 @@ func StartServer() error {
 	// Services
 	bookService := book.NewBookService(book.NewBookRepository(config.DB()))
 	libraryService := library.NewLibraryService(library.NewLibraryRepository(config.DB()))
+	loanService := loan.NewLoanService(loan.NewLoanRepository(config.DB()))
 
 	// Routes
 	endpoints.Authentication(r)
 	endpoints.Libraries(r, libraryService)
 	endpoints.Books(r, bookService)
+	endpoints.Loan(r, loanService)
+	endpoints.Reading(r)
 	endpoints.Profile(r)
 	endpoints.Billing(r)
-	endpoints.Loan(r)
-	endpoints.Reading(r)
 
 	// Health check
 	r.GET("/health", func(c *gin.Context) {

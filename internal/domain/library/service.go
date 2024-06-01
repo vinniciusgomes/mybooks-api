@@ -33,12 +33,12 @@ func (s *LibraryService) CreateLibrary(c *gin.Context) {
 		return
 	}
 
-	library.ID = id
-
-	if err := c.Bind(library); err != nil {
+	if err := c.BindJSON(library); err != nil {
 		utils.HandleError(c, err, http.StatusBadRequest)
 		return
 	}
+
+	library.ID = id
 
 	if err := utils.ValidateStruct(library); err != nil {
 		utils.HandleError(c, err, http.StatusUnprocessableEntity)
@@ -99,7 +99,7 @@ func (s *LibraryService) UpdateLibrary(c *gin.Context) {
 	id := c.Param("libraryId")
 
 	var library model.Library
-	if err := c.Bind(&library); err != nil {
+	if err := c.BindJSON(&library); err != nil {
 		utils.HandleError(c, err, http.StatusBadRequest)
 		return
 	}
@@ -130,7 +130,7 @@ func (s *LibraryService) AddBookToLibrary(c *gin.Context) {
 
 	var req AddBookRequest
 
-	if err := c.Bind(&req); err != nil {
+	if err := c.BindJSON(&req); err != nil {
 		utils.HandleError(c, err, http.StatusBadRequest)
 		return
 	}

@@ -43,7 +43,7 @@ func (r *libraryRepositoryImp) GetAllLibraries() (*[]model.Library, error) {
 
 func (r *libraryRepositoryImp) GetLibraryByID(id string) (*model.Library, error) {
 	var library model.Library
-	if err := r.db.First(&library, "id = ?", id).Error; err != nil {
+	if err := r.db.Preload("Books").First(&library, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 
@@ -51,14 +51,25 @@ func (r *libraryRepositoryImp) GetLibraryByID(id string) (*model.Library, error)
 }
 
 func (r *libraryRepositoryImp) DeleteLibrary(id string) error {
-	if err := r.db.Delete(&model.Library{}, "id = ?", id).Error; err != nil {
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+
+	if err := tx.Exec("DELETE FROM book_library WHERE library_id = ?", id).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Where("id = ?", id).Delete(&model.Library{}).Error; err != nil {
+		tx.Rollback()
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return fmt.Errorf("library not found")
 		}
 		return err
 	}
 
-	return nil
+	return tx.Commit().Error
 }
 
 func (r *libraryRepositoryImp) UpdateLibrary(library *model.Library) error {

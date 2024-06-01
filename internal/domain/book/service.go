@@ -30,12 +30,12 @@ func (s *BookService) CreateBook(c *gin.Context) {
 		return
 	}
 
-	book.ID = id
-
-	if err := c.Bind(book); err != nil {
+	if err := c.BindJSON(book); err != nil {
 		utils.HandleError(c, err, http.StatusBadRequest)
 		return
 	}
+
+	book.ID = id
 
 	if err := utils.ValidateStruct(book); err != nil {
 		utils.HandleError(c, err, http.StatusUnprocessableEntity)
@@ -112,6 +112,7 @@ func (s *BookService) DeleteBook(c *gin.Context) {
 			utils.HandleError(c, err, http.StatusNotFound)
 			return
 		}
+
 		utils.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
@@ -123,7 +124,7 @@ func (s *BookService) UpdateBook(c *gin.Context) {
 	id := c.Param("bookId")
 
 	var book model.Book
-	if err := c.Bind(&book); err != nil {
+	if err := c.BindJSON(&book); err != nil {
 		utils.HandleError(c, err, http.StatusBadRequest)
 		return
 	}

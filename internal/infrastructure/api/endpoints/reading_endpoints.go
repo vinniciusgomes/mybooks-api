@@ -7,10 +7,10 @@ import (
 )
 
 func Reading(r *gin.Engine) {
-	r.PUT("/books/:bookId/read", func(c *gin.Context) {
+	r.PUT("/v1/books/:bookId/read", func(c *gin.Context) {
 		c.String(http.StatusOK, "PUT /books/:bookId/read")
 	})
-	r.DELETE("/books/:bookId/read", func(c *gin.Context) {
+	r.DELETE("/v1/books/:bookId/read", func(c *gin.Context) {
 		c.String(http.StatusOK, "DELETE /books/:bookId/read")
 	})
 }

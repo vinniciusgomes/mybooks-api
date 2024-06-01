@@ -123,8 +123,9 @@ Now you should have the MyBooks API service up and running locally or in a produ
 
 ### Loan
 
-- [ ] Should be able to mark a book as loaned and indicate to whom;
-- [ ] Should be able to mark a book as returned;
+- [X] Should be able to create a loan and indicate to whom;
+- [x] Should be able to get all loans;
+- [X] Should be able to mark a loan as returned;
 
 ### Reading Status
 

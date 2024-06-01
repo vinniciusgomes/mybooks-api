@@ -7,10 +7,10 @@ import (
 )
 
 func Billing(r *gin.Engine) {
-	r.GET("/billing", func(c *gin.Context) {
+	r.GET("/v1/billing", func(c *gin.Context) {
 		c.String(http.StatusOK, "GET /billing")
 	})
-	r.POST("/subscribe", func(c *gin.Context) {
+	r.POST("/v1/subscribe", func(c *gin.Context) {
 		c.String(http.StatusOK, "POST /subscribe")
 	})
 }

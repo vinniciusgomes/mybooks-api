@@ -68,15 +68,22 @@ func (r *bookRepositoryImp) GetBookById(id string) (*model.Book, error) {
 }
 
 func (r *bookRepositoryImp) DeleteBook(id string) error {
-	if err := r.db.Delete(&model.Book{}, id).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("book not found")
-		}
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
 
+	if err := r.db.Exec("DELETE FROM book_library WHERE book_id = ?", id).Error; err != nil {
+		tx.Rollback()
 		return err
 	}
 
-	return nil
+	if err := tx.Where("id = ?", id).Delete(&model.Book{}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }
 
 func (r *bookRepositoryImp) UpdateBook(book *model.Book) error {
@@ -84,6 +91,7 @@ func (r *bookRepositoryImp) UpdateBook(book *model.Book) error {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return fmt.Errorf("book not found")
 		}
+
 		return err
 	}
 

@@ -62,13 +62,9 @@ air
 
 ### Running in Production with Docker
 To run the service in a production environment using Docker, follow these steps:
-1. Build the Docker image:
+1. Run Docker compose:
 ```
-docker build --tag mybooks .
-```
-2. Run the Docker container, mapping port 8080 on your local machine to port 8080 in the container:
-```
-docker run -p 8080:8080 mybooks
+docker-compose up --build
 ```
 
 Now you should have the MyBooks API service up and running locally or in a production environment.

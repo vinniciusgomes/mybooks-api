@@ -54,13 +54,13 @@ Manage loan status of books.
 - `GET v1/loans`: Get all loans
 - `PUT v1/loans/:loanId/return`: Mark loan as returned
 
-### Running Locally
+### Running local with Air
 To run the service locally, you can use [Air](https://github.com/cosmtrek/air) for hot-reloading. Run the following command:
 ```
 air
 ```
 
-### Running in Production with Docker
+### Running local with Docker
 To run the service in a production environment using Docker, follow these steps:
 1. Run Docker compose:
 ```

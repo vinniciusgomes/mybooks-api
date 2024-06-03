@@ -11,8 +11,12 @@ import (
 	"net/http"
 	"os"
 
+	docs "mybooks/api"
+
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // StartServer initializes the server and starts it.
@@ -41,12 +45,13 @@ func StartServer() error {
 		}
 	}
 
-	r := gin.Default()
+	router := gin.Default()
+	docs.SwaggerInfo.BasePath = "/api/v1"
 
 	// Middleware
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
-	r.Use(middlewares.CORSMiddleware())
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
+	router.Use(middlewares.CORSMiddleware())
 
 	// Database
 	config.DatabaseInit()
@@ -67,16 +72,17 @@ func StartServer() error {
 	loanService := loan.NewLoanService(loan.NewLoanRepository(config.DB()))
 
 	// Routes
-	endpoints.Libraries(r, libraryService)
-	endpoints.Books(r, bookService)
-	endpoints.Loan(r, loanService)
+	endpoints.Libraries(router, libraryService)
+	endpoints.Books(router, bookService)
+	endpoints.Loan(router, loanService)
 
-	// Health check
-	r.GET("/health", func(c *gin.Context) {
+	// Others routes
+	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
+			"message": "healthy",
 		})
 	})
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	// Start server
 	httpPort := os.Getenv("PORT")
@@ -84,5 +90,5 @@ func StartServer() error {
 		httpPort = "8080"
 	}
 
-	return r.Run(":" + httpPort)
+	return router.Run(":" + httpPort)
 }

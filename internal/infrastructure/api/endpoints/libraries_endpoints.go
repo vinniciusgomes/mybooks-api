@@ -14,10 +14,16 @@ import (
 //
 // Returns: None.
 func Libraries(r *gin.Engine, libraryService *library.LibraryService) {
-	r.GET("/v1/libraries", libraryService.GetAllLibraries)
-	r.GET("/v1/libraries/:libraryId", libraryService.GetLibraryByID)
-	r.POST("/v1/libraries", libraryService.CreateLibrary)
-	r.PUT("/v1/libraries/:libraryId", libraryService.UpdateLibrary)
-	r.DELETE("/v1/libraries/:libraryId", libraryService.DeleteLibrary)
-	r.POST("/v1/libraries/:libraryId/books", libraryService.AddBookToLibrary)
+	v1 := r.Group("/api/v1")
+	{
+		librariesRouter := v1.Group("/libraries")
+		{
+			librariesRouter.GET("/", libraryService.GetAllLibraries)
+			librariesRouter.GET("/:libraryId", libraryService.GetLibraryByID)
+			librariesRouter.POST("/", libraryService.CreateLibrary)
+			librariesRouter.PUT("/:libraryId", libraryService.UpdateLibrary)
+			librariesRouter.DELETE("/:libraryId", libraryService.DeleteLibrary)
+			librariesRouter.POST("/:libraryId/books", libraryService.AddBookToLibrary)
+		}
+	}
 }

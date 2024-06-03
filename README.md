@@ -54,21 +54,6 @@ Manage loan status of books.
 - `GET v1/loans`: Get all loans
 - `PUT v1/loans/:loanId/return`: Mark loan as returned
 
-### Running local with Air
-To run the service locally, you can use [Air](https://github.com/cosmtrek/air) for hot-reloading. Run the following command:
-```
-air
-```
-
-### Running local with Docker
-To run the service in a production environment using Docker, follow these steps:
-1. Run Docker compose:
-```
-docker-compose up --build
-```
-
-Now you should have the MyBooks API service up and running locally or in a production environment.
-
 ## Features roadmap
 
 ### Authentication
@@ -116,3 +101,87 @@ Now you should have the MyBooks API service up and running locally or in a produ
 - [X] Should be able to create a loan and indicate to whom;
 - [x] Should be able to get all loans;
 - [X] Should be able to mark a loan as returned;
+
+## Installation
+
+To use this project, you need to follow these steps:
+
+1. Clone the repository: `git clone https://github.com/vinniciusgomes/mybooks-api`
+2. Install the dependencies: `go mod download`
+3. Build the application: `go build`
+4. Run the application: `./cmd/api/main.go`
+
+## Running local with Air
+To run the service locally, you can use [Air](https://github.com/cosmtrek/air) for hot-reloading. Run the following command:
+```
+air
+```
+
+## Makefile Commands
+
+The project includes a Makefile to help you manage common tasks more easily. Here's a list of the available commands and a brief description of what they do:
+
+- `make run`: Run the application without generating API documentation.
+- `make run-with-docs`: Generate the API documentation using Swag, then run the application.
+- `make build`: Build the application and create an executable file named `gopportunities`.
+- `make test`: Run tests for all packages in the project.
+- `make docs`: Generate the API documentation using Swag.
+- `make clean`: Remove the `gopportunities` executable and delete the `./docs` directory.
+
+To use these commands, simply type `make` followed by the desired command in your terminal. For example:
+
+```sh
+make run
+```
+
+## Docker and Docker Compose
+
+This project includes a `Dockerfile` and `docker-compose.yml` file for easy containerization and deployment. Here are the most common Docker and Docker Compose commands you may want to use:
+
+- `docker build -t your-image-name .`: Build a Docker image for the project. Replace `your-image-name` with a name for your image.
+- `docker run -p 8080:8080 -e PORT=8080 your-image-name`: Run a container based on the built image. Replace `your-image-name` with the name you used when building the image. You can change the port number if necessary.
+
+If you want to use Docker Compose, follow these commands:
+
+- `docker compose build`: Build the services defined in the `docker-compose.yml` file.
+- `docker compose up`: Run the services defined in the `docker-compose.yml` file.
+
+To stop and remove containers, networks, and volumes defined in the `docker-compose.yml` file, run:
+
+```sh
+docker-compose down
+```
+
+For more information on Docker and Docker Compose, refer to the official documentation:
+
+- [Docker](https://docs.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+## Used Tools
+
+This project uses the following tools:
+
+- [Golang](https://golang.org/) for backend development
+- [Go-Gin](https://github.com/gin-gonic/gin) for route management
+- [GoORM](https://gorm.io/) for database communication
+- [Swagger](https://swagger.io/) for API documentation and testing
+
+## Contributing
+
+To contribute to this project, please follow these guidelines:
+
+1. Fork the repository
+2. Create a new branch: `git checkout -b feature/your-feature-name`
+3. Make your changes and commit them using Conventional Commits
+4. Push to the branch: `git push origin feature/your-feature-name`
+5. Submit a pull request
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE.md file for details.
+
+## Credits
+
+This project was created by [vinniciusgomes](https://github.com/vinniciusgomes).

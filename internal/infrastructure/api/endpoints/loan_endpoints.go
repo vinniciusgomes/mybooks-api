@@ -14,7 +14,13 @@ import (
 //
 // Return type: None.
 func Loan(r *gin.Engine, loanService *loan.LoanService) {
-	r.POST("/v1/loans", loanService.CreateLoan)
-	r.GET("/v1/loans", loanService.GetAllLoans)
-	r.PUT("/v1/loans/:loanId/return", loanService.ReturnLoan)
+	v1 := r.Group("/api/v1")
+	{
+		loansRouter := v1.Group("/loans")
+		{
+			loansRouter.POST("/v1/loans", loanService.CreateLoan)
+			loansRouter.GET("/v1/loans", loanService.GetAllLoans)
+			loansRouter.PUT("/v1/loans/:loanId/return", loanService.ReturnLoan)
+		}
+	}
 }

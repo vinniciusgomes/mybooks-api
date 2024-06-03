@@ -9,14 +9,20 @@ import (
 // Books registers the book endpoints with the provided gin.Engine and book.BookService.
 //
 // Parameters:
-// - r: a pointer to a gin.Engine object representing the HTTP router.
+// - router: a pointer to a gin.Engine object representing the HTTP router.
 // - bookService: a pointer to a book.BookService object providing the book-related operations.
 //
 // Returns: None.
-func Books(r *gin.Engine, bookService *book.BookService) {
-	r.GET("/v1/books", bookService.GetAllBooks)
-	r.GET("/v1/books/:bookId", bookService.GetBookById)
-	r.POST("/v1/books", bookService.CreateBook)
-	r.PUT("/v1/books/:bookId", bookService.UpdateBook)
-	r.DELETE("/v1/books/:bookId", bookService.DeleteBook)
+func Books(router *gin.Engine, bookService *book.BookService) {
+	v1 := router.Group("/api/v1")
+	{
+		booksRouter := v1.Group("/books")
+		{
+			booksRouter.GET("/", bookService.GetAllBooks)
+			booksRouter.GET("/:bookId", bookService.GetBookById)
+			booksRouter.POST("", bookService.CreateBook)
+			booksRouter.PUT("/:bookId", bookService.UpdateBook)
+			booksRouter.DELETE("/:bookId", bookService.DeleteBook)
+		}
+	}
 }

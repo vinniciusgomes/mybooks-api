@@ -1,8 +1,9 @@
 package library
 
 import (
+	"mybooks/internal/infrastructure/helper"
 	"mybooks/internal/infrastructure/model"
-	"mybooks/internal/infrastructure/utils"
+	"mybooks/pkg"
 	"net/http"
 	"strings"
 	"time"
@@ -27,35 +28,47 @@ type LibraryResponse struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
+// NewLibraryService creates a new instance of LibraryService.
+//
+// Parameters:
+// - repo: The LibraryRepository implementation used by the service.
+//
+// Returns:
+// - *LibraryService: A pointer to the newly created LibraryService instance.
 func NewLibraryService(repo LibraryRepository) *LibraryService {
 	return &LibraryService{
 		repo: repo,
 	}
 }
 
+// CreateLibrary creates a new library in the database.
+//
+// It takes a pointer to a gin.Context as a parameter and returns nothing.
+// The function generates a random ID, binds the JSON request body to a Library struct,
+// validates the struct, creates the library in the repository, and returns the ID of the created library.
 func (s *LibraryService) CreateLibrary(c *gin.Context) {
 	library := new(model.Library)
 
-	id, err := utils.GenerateRandomID()
+	id, err := pkg.GenerateRandomID()
 	if err != nil {
-		utils.HandleError(c, err, http.StatusInternalServerError)
+		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
 	if err := c.BindJSON(library); err != nil {
-		utils.HandleError(c, err, http.StatusBadRequest)
+		helper.HandleError(c, err, http.StatusBadRequest)
 		return
 	}
 
 	library.ID = id
 
-	if err := utils.ValidateStruct(library); err != nil {
-		utils.HandleError(c, err, http.StatusUnprocessableEntity)
+	if err := pkg.ValidateModelStruct(library); err != nil {
+		helper.HandleError(c, err, http.StatusUnprocessableEntity)
 		return
 	}
 
 	if err := s.repo.CreateLibrary(library); err != nil {
-		utils.HandleError(c, err, http.StatusInternalServerError)
+		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -66,10 +79,17 @@ func (s *LibraryService) CreateLibrary(c *gin.Context) {
 	c.JSON(http.StatusCreated, data)
 }
 
+// GetAllLibraries retrieves all libraries from the library service and returns them as a JSON response.
+//
+// Parameters:
+// - c: a pointer to a gin.Context object representing the HTTP request and response.
+//
+// Returns:
+// - None
 func (s *LibraryService) GetAllLibraries(c *gin.Context) {
 	libraries, err := s.repo.GetAllLibraries()
 	if err != nil {
-		utils.HandleError(c, err, http.StatusInternalServerError)
+		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -87,78 +107,108 @@ func (s *LibraryService) GetAllLibraries(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetLibraryByID retrieves a library by its ID.
+//
+// Parameters:
+// - c: a pointer to a gin.Context object representing the HTTP request and response.
+//
+// Returns:
+// - None
 func (s *LibraryService) GetLibraryByID(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 
 	library, err := s.repo.GetLibraryByID(libraryID)
 	if err != nil {
-		utils.HandleError(c, err, http.StatusInternalServerError)
+		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
 	c.JSON(http.StatusOK, library)
 }
 
+// DeleteLibrary deletes a library by its ID.
+//
+// Parameters:
+// - c: a pointer to a gin.Context object representing the HTTP request and response.
+//
+// Returns:
+// - None
 func (s *LibraryService) DeleteLibrary(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 
 	if err := s.repo.DeleteLibrary(libraryID); err != nil {
 		if strings.Contains(err.Error(), "library not found") {
-			utils.HandleError(c, err, http.StatusNotFound)
+			helper.HandleError(c, err, http.StatusNotFound)
 			return
 		}
 
-		utils.HandleError(c, err, http.StatusInternalServerError)
+		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
 	c.Status(http.StatusOK)
 }
 
+// UpdateLibrary updates a library in the LibraryService.
+//
+// It takes a pointer to a gin.Context as a parameter and returns nothing.
+// The function retrieves the library ID from the request parameter,
+// binds the JSON request body to a Library struct,
+// parses the ID, validates the struct,
+// updates the library in the repository,
+// and returns an HTTP status code indicating the success of the operation.
 func (s *LibraryService) UpdateLibrary(c *gin.Context) {
 	id := c.Param("libraryId")
 
 	var library model.Library
 	if err := c.BindJSON(&library); err != nil {
-		utils.HandleError(c, err, http.StatusBadRequest)
+		helper.HandleError(c, err, http.StatusBadRequest)
 		return
 	}
 
 	libraryID, err := uuid.Parse(id)
 	if err != nil {
-		utils.HandleError(c, err, http.StatusBadRequest)
+		helper.HandleError(c, err, http.StatusBadRequest)
 		return
 	}
 
 	library.ID = libraryID
 
-	if err := utils.ValidateStruct(library); err != nil {
-		utils.HandleError(c, err, http.StatusUnprocessableEntity)
+	if err := pkg.ValidateModelStruct(library); err != nil {
+		helper.HandleError(c, err, http.StatusUnprocessableEntity)
 		return
 	}
 
 	if err := s.repo.UpdateLibrary(&library); err != nil {
-		utils.HandleError(c, err, http.StatusInternalServerError)
+		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
 	c.Status(http.StatusOK)
 }
 
+// AddBookToLibrary adds a book to a library in the LibraryService.
+//
+// It takes a pointer to a gin.Context as a parameter and returns nothing.
+// The function retrieves the library ID from the request parameter,
+// binds the JSON request body to an AddBookRequest struct,
+// retrieves the book ID from the request body,
+// adds the book to the library in the repository,
+// and returns an HTTP status code indicating the success of the operation.
 func (s *LibraryService) AddBookToLibrary(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 
 	var req AddBookRequest
 
 	if err := c.BindJSON(&req); err != nil {
-		utils.HandleError(c, err, http.StatusBadRequest)
+		helper.HandleError(c, err, http.StatusBadRequest)
 		return
 	}
 
 	bookID := req.BookID
 
 	if err := s.repo.AddBookToLibrary(libraryID, bookID); err != nil {
-		utils.HandleError(c, err, http.StatusInternalServerError)
+		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 

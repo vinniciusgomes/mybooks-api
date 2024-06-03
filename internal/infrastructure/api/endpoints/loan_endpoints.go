@@ -18,9 +18,9 @@ func Loan(r *gin.Engine, loanService *loan.LoanService) {
 	{
 		loansRouter := v1.Group("/loans")
 		{
-			loansRouter.POST("/v1/loans", loanService.CreateLoan)
-			loansRouter.GET("/v1/loans", loanService.GetAllLoans)
-			loansRouter.PUT("/v1/loans/:loanId/return", loanService.ReturnLoan)
+			loansRouter.POST("/", loanService.CreateLoan)
+			loansRouter.GET("/", loanService.GetAllLoans)
+			loansRouter.PUT("/:loanId/return", loanService.ReturnLoan)
 		}
 	}
 }

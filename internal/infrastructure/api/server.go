@@ -77,7 +77,7 @@ func StartServer() error {
 	endpoints.Loan(router, loanService)
 
 	// Others routes
-	router.GET("/", func(c *gin.Context) {
+	router.GET("/v1/health", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "healthy",
 		})

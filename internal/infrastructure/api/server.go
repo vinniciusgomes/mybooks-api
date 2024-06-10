@@ -2,6 +2,7 @@ package api
 
 import (
 	"log"
+	"mybooks/internal/domain/authentication"
 	"mybooks/internal/domain/book"
 	"mybooks/internal/domain/library"
 	"mybooks/internal/domain/loan"
@@ -67,11 +68,13 @@ func StartServer() error {
 	}
 
 	// Services
+	authService := authentication.NewAuthenticationService(authentication.NewAuthenticationRepository(config.DB()))
 	bookService := book.NewBookService(book.NewBookRepository(config.DB()))
 	libraryService := library.NewLibraryService(library.NewLibraryRepository(config.DB()))
 	loanService := loan.NewLoanService(loan.NewLoanRepository(config.DB()))
 
 	// Routes
+	endpoints.Authentication(router, authService)
 	endpoints.Libraries(router, libraryService)
 	endpoints.Books(router, bookService)
 	endpoints.Loan(router, loanService)

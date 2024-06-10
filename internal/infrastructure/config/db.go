@@ -32,7 +32,7 @@ func DatabaseInit() {
 		panic(e)
 	}
 
-	database.AutoMigrate(&model.Book{}, &model.Library{}, &model.Loan{})
+	database.AutoMigrate(&model.User{}, &model.Book{}, &model.Library{}, &model.Loan{})
 }
 
 // DB returns the *gorm.DB object representing the database connection.

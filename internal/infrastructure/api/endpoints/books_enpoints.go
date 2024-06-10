@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"mybooks/internal/domain/book"
+	"mybooks/internal/infrastructure/api/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,11 +19,11 @@ func Books(router *gin.Engine, bookService *book.BookService) {
 	{
 		booksRouter := v1.Group("/books")
 		{
-			booksRouter.GET("/", bookService.GetAllBooks)
-			booksRouter.GET("/:bookId", bookService.GetBookById)
-			booksRouter.POST("", bookService.CreateBook)
-			booksRouter.PUT("/:bookId", bookService.UpdateBook)
-			booksRouter.DELETE("/:bookId", bookService.DeleteBook)
+			booksRouter.GET("/", middlewares.RequireAuth, bookService.GetAllBooks)
+			booksRouter.GET("/:bookId", middlewares.RequireAuth, bookService.GetBookById)
+			booksRouter.POST("", middlewares.RequireAuth, bookService.CreateBook)
+			booksRouter.PUT("/:bookId", middlewares.RequireAuth, bookService.UpdateBook)
+			booksRouter.DELETE("/:bookId", middlewares.RequireAuth, bookService.DeleteBook)
 		}
 	}
 }

@@ -4,11 +4,12 @@
 Welcome to the documentation for the MyBooks API. MyBooks is a SaaS project designed to help users organize their personal library. This API provides endpoints for managing libraries, books, user profiles, billing, and loan status.
 
 ### Authentication
-Authentication is required for most endpoints. MyBooks supports magic link authentication and authentication via Google account.
+Authentication is required for most endpoints. MyBooks supports credentials authentication and authentication via Google account.
 
 #### Endpoints:
-- `POST v1/auth`: Authenticate using magic link.
-- `POST v1/auth/google`: Authenticate using Google account
+- `POST v1/auth/signup/credentials`: Create user with credentials.
+- `POST v1/auth/signin/credentials`: Authentication user with credentials.
+- `GET v1/auth/validate`: Validate access_token cookie.
 
 ### Libraries
 Manage libraries where users can organize their books.
@@ -58,7 +59,8 @@ Manage loan status of books.
 
 ### Authentication
 
-- [ ] Should be able to authenticate using magic link;
+- [X] Should be able to authenticate using credentials;
+- [ ] Should be able to refresh token;
 - [ ] Should be able to authenticate using Google account;
 
 ### Library ✅

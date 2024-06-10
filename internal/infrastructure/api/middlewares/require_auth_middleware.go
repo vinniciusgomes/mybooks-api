@@ -87,21 +87,8 @@ func RequireAuth(c *gin.Context) {
 		return
 	}
 
-	// Create an anonymous struct with the fields to include in the response
-	publicUser := struct {
-		ID        uuid.UUID `json:"id"`
-		Email     string    `json:"email"`
-		CreatedAt time.Time `json:"created_at"`
-		UpdatedAt time.Time `json:"updated_at"`
-	}{
-		ID:        user.ID,
-		Email:     user.Email,
-		CreatedAt: user.CreatedAt,
-		UpdatedAt: user.UpdatedAt,
-	}
-
 	// Attach the public user to the context
-	c.Set("user", publicUser)
+	c.Set("user", user)
 
 	// Continue with the next handler
 	c.Next()

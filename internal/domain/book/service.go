@@ -34,6 +34,12 @@ func NewBookService(repo BookRepository) *BookService {
 func (s *BookService) CreateBook(c *gin.Context) {
 	book := new(model.Book)
 
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+
 	id, err := pkg.GenerateRandomID()
 	if err != nil {
 		helper.HandleError(c, err, http.StatusInternalServerError)
@@ -46,6 +52,8 @@ func (s *BookService) CreateBook(c *gin.Context) {
 	}
 
 	book.ID = id
+	book.UserID = user.ID
+	book.User = *user
 
 	if err := pkg.ValidateModelStruct(book); err != nil {
 		helper.HandleError(c, err, http.StatusUnprocessableEntity)
@@ -70,6 +78,13 @@ func (s *BookService) CreateBook(c *gin.Context) {
 // Returns:
 // - None.
 func (s *BookService) GetAllBooks(c *gin.Context) {
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
 	filters := make(map[string]interface{})
 
 	if title := strings.TrimSpace(c.Query("title")); title != "" {
@@ -96,7 +111,7 @@ func (s *BookService) GetAllBooks(c *gin.Context) {
 		filters["read"] = readBool
 	}
 
-	books, err := s.repo.GetAllBooks(filters)
+	books, err := s.repo.GetAllBooks(userID.String(), filters)
 	if err != nil {
 		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
@@ -105,10 +120,24 @@ func (s *BookService) GetAllBooks(c *gin.Context) {
 	c.JSON(http.StatusOK, books)
 }
 
+// GetBookById retrieves a book by its ID from the BookService.
+//
+// Parameters:
+// - c: a pointer to a gin.Context object representing the HTTP request and response.
+//
+// Returns:
+// - None.
 func (s *BookService) GetBookById(c *gin.Context) {
 	id := c.Param("bookId")
 
-	book, err := s.repo.GetBookById(id)
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
+	book, err := s.repo.GetBookById(userID.String(), id)
 	if err != nil {
 		if strings.Contains(err.Error(), "book not found") {
 			helper.HandleError(c, err, http.StatusNotFound)
@@ -131,7 +160,14 @@ func (s *BookService) GetBookById(c *gin.Context) {
 func (s *BookService) DeleteBook(c *gin.Context) {
 	id := c.Param("bookId")
 
-	if err := s.repo.DeleteBook(id); err != nil {
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
+	if err := s.repo.DeleteBook(userID.String(), id); err != nil {
 		if strings.Contains(err.Error(), "book not found") {
 			helper.HandleError(c, err, http.StatusNotFound)
 			return
@@ -153,6 +189,13 @@ func (s *BookService) DeleteBook(c *gin.Context) {
 func (s *BookService) UpdateBook(c *gin.Context) {
 	id := c.Param("bookId")
 
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
 	var book model.Book
 	if err := c.BindJSON(&book); err != nil {
 		helper.HandleError(c, err, http.StatusBadRequest)
@@ -167,7 +210,7 @@ func (s *BookService) UpdateBook(c *gin.Context) {
 
 	book.ID = bookID
 
-	if err := s.repo.UpdateBook(&book); err != nil {
+	if err := s.repo.UpdateBook(userID.String(), &book); err != nil {
 		if strings.Contains(err.Error(), "book not found") {
 			helper.HandleError(c, err, http.StatusNotFound)
 			return

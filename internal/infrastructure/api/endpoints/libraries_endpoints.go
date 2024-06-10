@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"mybooks/internal/domain/library"
+	"mybooks/internal/infrastructure/api/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,12 +19,12 @@ func Libraries(r *gin.Engine, libraryService *library.LibraryService) {
 	{
 		librariesRouter := v1.Group("/libraries")
 		{
-			librariesRouter.GET("/", libraryService.GetAllLibraries)
-			librariesRouter.GET("/:libraryId", libraryService.GetLibraryByID)
-			librariesRouter.POST("/", libraryService.CreateLibrary)
-			librariesRouter.PUT("/:libraryId", libraryService.UpdateLibrary)
-			librariesRouter.DELETE("/:libraryId", libraryService.DeleteLibrary)
-			librariesRouter.POST("/:libraryId/books", libraryService.AddBookToLibrary)
+			librariesRouter.GET("/", middlewares.RequireAuth, libraryService.GetAllLibraries)
+			librariesRouter.GET("/:libraryId", middlewares.RequireAuth, libraryService.GetLibraryByID)
+			librariesRouter.POST("/", middlewares.RequireAuth, libraryService.CreateLibrary)
+			librariesRouter.PUT("/:libraryId", middlewares.RequireAuth, libraryService.UpdateLibrary)
+			librariesRouter.DELETE("/:libraryId", middlewares.RequireAuth, libraryService.DeleteLibrary)
+			librariesRouter.POST("/:libraryId/books", middlewares.RequireAuth, libraryService.AddBookToLibrary)
 		}
 	}
 }

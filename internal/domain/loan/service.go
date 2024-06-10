@@ -33,6 +33,13 @@ func NewLoanService(repo LoanRepository) *LoanService {
 func (s *LoanService) CreateLoan(c *gin.Context) {
 	loan := new(model.Loan)
 
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
 	id, err := pkg.GenerateRandomID()
 	if err != nil {
 		helper.HandleError(c, err, http.StatusInternalServerError)
@@ -45,6 +52,7 @@ func (s *LoanService) CreateLoan(c *gin.Context) {
 	}
 
 	loan.ID = id
+	loan.UserID = userID
 
 	if err := pkg.ValidateModelStruct(loan); err != nil {
 		helper.HandleError(c, err, http.StatusUnprocessableEntity)
@@ -72,7 +80,14 @@ func (s *LoanService) CreateLoan(c *gin.Context) {
 // The function retrieves all loans from the loan repository and returns them as JSON in the response body.
 // If an error occurs during the process, it handles the error and returns an appropriate HTTP status code.
 func (s *LoanService) GetAllLoans(c *gin.Context) {
-	loans, err := s.repo.GetAllLoans()
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
+	loans, err := s.repo.GetAllLoans(userID.String())
 	if err != nil {
 		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
@@ -90,7 +105,14 @@ func (s *LoanService) GetAllLoans(c *gin.Context) {
 func (s *LoanService) ReturnLoan(c *gin.Context) {
 	loanID := c.Param("loanId")
 
-	if err := s.repo.ReturnLoan(loanID); err != nil {
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
+	if err := s.repo.ReturnLoan(userID.String(), loanID); err != nil {
 		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}

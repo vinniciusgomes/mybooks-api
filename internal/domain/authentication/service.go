@@ -146,7 +146,7 @@ func (s *AuthenticationService) SignInWithCredentials(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie(helper.AuthCookieName, tokenString, 3600*24*7, "", "", false, true)
 
-	c.Status(http.StatusNoContent)
+	c.Status(http.StatusOK)
 }
 
 // ValidateToken validates a JWT token from a cookie in the given gin.Context.

@@ -12,6 +12,7 @@ type User struct {
 	Email     string         `json:"email" gorm:"unique;not null;size:100" validate:"required,min=1,max=100"`
 	Password  string         `json:"password" gorm:"not null;size:100" validate:"required,min=1,max=100"`
 	Books     []Book         `json:"books" gorm:"foreignKey:UserID"`
+	Libraries []Library      `json:"libraries" gorm:"foreignKey:UserID"`
 	CreatedAt time.Time      `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `json:"deleted_at" gorm:"index"`

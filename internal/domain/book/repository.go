@@ -101,9 +101,12 @@ func (r *bookRepositoryImp) GetBookById(userID, id string) (*model.Book, error) 
 // - error: an error object if there was an issue deleting the book.
 func (r *bookRepositoryImp) DeleteBook(userID, id string) error {
 	tx := r.db.Begin()
-	if tx.Error != nil {
-		return tx.Error
-	}
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			panic(r) // Re-throw panic after Rollback
+		}
+	}()
 
 	// Delete the relation in the book_library table
 	if err := r.db.Exec("DELETE FROM book_library WHERE book_id = ?", id).Error; err != nil {

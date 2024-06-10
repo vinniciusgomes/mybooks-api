@@ -194,6 +194,7 @@ func (s *BookService) UpdateBook(c *gin.Context) {
 		helper.HandleError(c, err, http.StatusUnauthorized)
 		return
 	}
+
 	userID := user.ID
 
 	var book model.Book

@@ -49,6 +49,12 @@ func NewLibraryService(repo LibraryRepository) *LibraryService {
 func (s *LibraryService) CreateLibrary(c *gin.Context) {
 	library := new(model.Library)
 
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+
 	id, err := pkg.GenerateRandomID()
 	if err != nil {
 		helper.HandleError(c, err, http.StatusInternalServerError)
@@ -61,6 +67,8 @@ func (s *LibraryService) CreateLibrary(c *gin.Context) {
 	}
 
 	library.ID = id
+	library.UserID = user.ID
+	library.User = *user
 
 	if err := pkg.ValidateModelStruct(library); err != nil {
 		helper.HandleError(c, err, http.StatusUnprocessableEntity)
@@ -87,7 +95,14 @@ func (s *LibraryService) CreateLibrary(c *gin.Context) {
 // Returns:
 // - None
 func (s *LibraryService) GetAllLibraries(c *gin.Context) {
-	libraries, err := s.repo.GetAllLibraries()
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
+	libraries, err := s.repo.GetAllLibraries(userID.String())
 	if err != nil {
 		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
@@ -117,8 +132,20 @@ func (s *LibraryService) GetAllLibraries(c *gin.Context) {
 func (s *LibraryService) GetLibraryByID(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 
-	library, err := s.repo.GetLibraryByID(libraryID)
+	user, err := helper.GetUserFromContext(c)
 	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
+	library, err := s.repo.GetLibraryByID(userID.String(), libraryID)
+	if err != nil {
+		if strings.Contains(err.Error(), "library not found") {
+			helper.HandleError(c, err, http.StatusNotFound)
+			return
+		}
+
 		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
@@ -136,7 +163,14 @@ func (s *LibraryService) GetLibraryByID(c *gin.Context) {
 func (s *LibraryService) DeleteLibrary(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 
-	if err := s.repo.DeleteLibrary(libraryID); err != nil {
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
+	if err := s.repo.DeleteLibrary(userID.String(), libraryID); err != nil {
 		if strings.Contains(err.Error(), "library not found") {
 			helper.HandleError(c, err, http.StatusNotFound)
 			return
@@ -146,7 +180,7 @@ func (s *LibraryService) DeleteLibrary(c *gin.Context) {
 		return
 	}
 
-	c.Status(http.StatusOK)
+	c.JSON(http.StatusOK, gin.H{"message": "Library deleted successfully"})
 }
 
 // UpdateLibrary updates a library in the LibraryService.
@@ -159,6 +193,13 @@ func (s *LibraryService) DeleteLibrary(c *gin.Context) {
 // and returns an HTTP status code indicating the success of the operation.
 func (s *LibraryService) UpdateLibrary(c *gin.Context) {
 	id := c.Param("libraryId")
+
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
 
 	var library model.Library
 	if err := c.BindJSON(&library); err != nil {
@@ -173,13 +214,14 @@ func (s *LibraryService) UpdateLibrary(c *gin.Context) {
 	}
 
 	library.ID = libraryID
+	library.User = *user
 
 	if err := pkg.ValidateModelStruct(library); err != nil {
 		helper.HandleError(c, err, http.StatusUnprocessableEntity)
 		return
 	}
 
-	if err := s.repo.UpdateLibrary(&library); err != nil {
+	if err := s.repo.UpdateLibrary(userID.String(), &library); err != nil {
 		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
@@ -198,6 +240,13 @@ func (s *LibraryService) UpdateLibrary(c *gin.Context) {
 func (s *LibraryService) AddBookToLibrary(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
 	var req AddBookRequest
 
 	if err := c.BindJSON(&req); err != nil {
@@ -207,7 +256,7 @@ func (s *LibraryService) AddBookToLibrary(c *gin.Context) {
 
 	bookID := req.BookID
 
-	if err := s.repo.AddBookToLibrary(libraryID, bookID); err != nil {
+	if err := s.repo.AddBookToLibrary(userID.String(), libraryID, bookID); err != nil {
 		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}

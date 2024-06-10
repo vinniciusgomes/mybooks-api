@@ -12,6 +12,7 @@ type Loan struct {
 	LoanDate     string    `json:"loan_date" gorm:"not null;size:20" validate:"required,min=1,max=20"`
 	BorrowerName string    `json:"borrower_name" gorm:"not null;size:100;index" validate:"required,min=1,max=100"`
 	IsReturned   bool      `json:"is_returned" gorm:"default:false"`
+	UserID       uuid.UUID `json:"user_id" gorm:"type:uuid;not null;index"`
 	CreatedAt    time.Time `json:"created_at" gorm:"autoCreateTime"`
 	UpdatedAt    time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }

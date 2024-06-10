@@ -10,18 +10,14 @@ import (
 
 type LoanRepository interface {
 	CreateLoan(loan *model.Loan) error
-	GetAllLoans() (*[]model.Loan, error)
-	ReturnLoan(loanID string) error
+	GetAllLoans(userID string) (*[]model.Loan, error)
+	ReturnLoan(userID, loanID string) error
 }
 
 type loanRepositoryImp struct {
 	db *gorm.DB
 }
 
-// NewLoanRepository creates a new instance of the LoanRepository interface.
-//
-// It takes a *gorm.DB parameter, which represents the database connection.
-// It returns a LoanRepository pointer, which is an implementation of the LoanRepository interface.
 func NewLoanRepository(db *gorm.DB) LoanRepository {
 	return &loanRepositoryImp{
 		db: db,
@@ -54,28 +50,34 @@ func (r *loanRepositoryImp) CreateLoan(loan *model.Loan) error {
 	return nil
 }
 
-// GetAllLoans retrieves all loans from the loan repository.
+// GetAllLoans retrieves all loans for a given user from the loan repository.
 //
-// It returns a pointer to a slice of model.Loan and an error if any.
-func (r *loanRepositoryImp) GetAllLoans() (*[]model.Loan, error) {
+// Parameters:
+// - userID: the ID of the user whose loans are being retrieved.
+//
+// Returns:
+// - *[]model.Loan: a pointer to a slice of model.Loan representing the loans for the user, or nil if there are no loans.
+// - error: an error if there was a problem retrieving the loans.
+func (r *loanRepositoryImp) GetAllLoans(userID string) (*[]model.Loan, error) {
 	var loans []model.Loan
 
-	if err := r.db.Find(&loans).Error; err != nil {
+	if err := r.db.Where("user_id = ?", userID).Find(&loans).Error; err != nil {
 		return nil, err
 	}
 
 	return &loans, nil
 }
 
-// ReturnLoan updates the loan with the given ID to mark it as returned.
+// ReturnLoan updates the "is_returned" field of a loan record in the database.
 //
 // Parameters:
-// - loanID: The ID of the loan to be marked as returned.
+// - userID: the ID of the user who is returning the loan.
+// - loanID: the ID of the loan being returned.
 //
 // Returns:
-// - error: An error if the update operation fails.
-func (r *loanRepositoryImp) ReturnLoan(loanID string) error {
-	if err := r.db.Model(&model.Loan{}).Where("id = ?", loanID).Update("is_returned", true).Error; err != nil {
+// - error: an error if there was a problem updating the loan record.
+func (r *loanRepositoryImp) ReturnLoan(userID, loanID string) error {
+	if err := r.db.Model(&model.Loan{}).Where("id = ? AND user_id = ?", loanID, userID).Update("is_returned", true).Error; err != nil {
 		return err
 	}
 

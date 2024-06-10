@@ -146,7 +146,7 @@ func (s *AuthenticationService) SignInWithCredentials(c *gin.Context) {
 	c.SetSameSite(http.SameSiteLaxMode)
 	c.SetCookie(helper.AuthCookieName, tokenString, 3600*24*7, "", "", false, true)
 
-	c.Status(http.StatusNoContent)
+	c.Status(http.StatusOK)
 }
 
 // ValidateToken validates a JWT token from a cookie in the given gin.Context.
@@ -162,13 +162,20 @@ func (s *AuthenticationService) SignInWithCredentials(c *gin.Context) {
 // Returns:
 // - None.
 func (s *AuthenticationService) ValidateToken(c *gin.Context) {
-	user, err := c.Get("user")
-	if !err {
-		helper.HandleError(c, errors.New("user not found"), http.StatusUnauthorized)
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"user": user,
-	})
+	response := map[string]interface{}{
+		"user": map[string]interface{}{
+			"id":         user.ID,
+			"email":      user.Email,
+			"created_at": user.CreatedAt,
+			"updated_at": user.UpdatedAt,
+		},
+	}
+
+	c.JSON(http.StatusOK, response)
 }

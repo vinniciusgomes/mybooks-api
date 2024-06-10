@@ -55,14 +55,25 @@ func (r *authenticationRepositoryImp) CreateUser(user *model.User) error {
 // - *model.User
 func (r *authenticationRepositoryImp) GetUserByEmail(email string) (*model.User, error) {
 	var user model.User
-	return &user, r.db.Where("email = ?", email).First(&user).Error
+
+	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
+// GetUserByID retrieves a user from the database based on the provided ID.
+//
+// Parameters:
+// - id: a string representing the ID of the user.
+//
+// Returns:
+// - *model.User
 func (r *authenticationRepositoryImp) GetUserByID(id string) (*model.User, error) {
 	var user model.User
 
-	err := r.db.Where("id = ?", id).First(&user).Error
-	if err != nil {
+	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err
 	}
 

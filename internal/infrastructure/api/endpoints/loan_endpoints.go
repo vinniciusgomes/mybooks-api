@@ -2,6 +2,7 @@ package endpoints
 
 import (
 	"mybooks/internal/domain/loan"
+	"mybooks/internal/infrastructure/api/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
@@ -18,9 +19,9 @@ func Loan(r *gin.Engine, loanService *loan.LoanService) {
 	{
 		loansRouter := v1.Group("/loans")
 		{
-			loansRouter.POST("/", loanService.CreateLoan)
-			loansRouter.GET("/", loanService.GetAllLoans)
-			loansRouter.PUT("/:loanId/return", loanService.ReturnLoan)
+			loansRouter.POST("/", middlewares.RequireAuth, loanService.CreateLoan)
+			loansRouter.GET("/", middlewares.RequireAuth, loanService.GetAllLoans)
+			loansRouter.PUT("/:loanId/return", middlewares.RequireAuth, loanService.ReturnLoan)
 		}
 	}
 }

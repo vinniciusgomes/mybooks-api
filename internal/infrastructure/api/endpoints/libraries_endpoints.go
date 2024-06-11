@@ -24,7 +24,8 @@ func Libraries(router *gin.Engine, libraryService *library.LibraryService) {
 			librariesRouter.POST("/", middlewares.JWTAuthMiddleware(), libraryService.CreateLibrary)
 			librariesRouter.PUT("/:libraryId", middlewares.JWTAuthMiddleware(), libraryService.UpdateLibrary)
 			librariesRouter.DELETE("/:libraryId", middlewares.JWTAuthMiddleware(), libraryService.DeleteLibrary)
-			librariesRouter.POST("/:libraryId/books", middlewares.JWTAuthMiddleware(), libraryService.AddBookToLibrary)
+			librariesRouter.POST("/:libraryId/books/:bookId", middlewares.JWTAuthMiddleware(), libraryService.AddBookToLibrary)
+			librariesRouter.DELETE("/:libraryId/books/:bookId", middlewares.JWTAuthMiddleware(), libraryService.RemoveBookFromLibrary)
 		}
 	}
 }

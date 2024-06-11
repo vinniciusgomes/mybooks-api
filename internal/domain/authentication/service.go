@@ -149,6 +149,23 @@ func (s *AuthenticationService) SignInWithCredentials(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
+// SignOut signs out the user by clearing the authentication cookie in the given gin.Context.
+//
+// It takes a pointer to a gin.Context as a parameter and returns nothing.
+// The function sets the "access_token" cookie with an empty value and an expiration time of -1,
+// effectively removing the authentication cookie from the browser.
+// It then sets the status code of the response to 200 OK.
+//
+// Parameters:
+// - c: a pointer to a gin.Context.
+//
+// Returns:
+// - None.
+func (s *AuthenticationService) SignOut(c *gin.Context) {
+	c.SetCookie(helper.AuthCookieName, "", -1, "", "", false, true)
+	c.Status(http.StatusOK)
+}
+
 // ValidateToken validates a JWT token from a cookie in the given gin.Context.
 //
 // It takes a pointer to a gin.Context as a parameter and returns nothing.

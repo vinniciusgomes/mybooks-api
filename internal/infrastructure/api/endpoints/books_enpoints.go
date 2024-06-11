@@ -15,15 +15,15 @@ import (
 //
 // Returns: None.
 func Books(router *gin.Engine, bookService *book.BookService) {
-	v1 := router.Group("/api/v1")
+	v1 := router.Group("/v1")
 	{
 		booksRouter := v1.Group("/books")
 		{
-			booksRouter.GET("/", middlewares.RequireAuth, bookService.GetAllBooks)
-			booksRouter.GET("/:bookId", middlewares.RequireAuth, bookService.GetBookById)
-			booksRouter.POST("", middlewares.RequireAuth, bookService.CreateBook)
-			booksRouter.PUT("/:bookId", middlewares.RequireAuth, bookService.UpdateBook)
-			booksRouter.DELETE("/:bookId", middlewares.RequireAuth, bookService.DeleteBook)
+			booksRouter.GET("/", middlewares.JWTAuthMiddleware(), bookService.GetAllBooks)
+			booksRouter.GET("/:bookId", middlewares.JWTAuthMiddleware(), bookService.GetBookById)
+			booksRouter.POST("", middlewares.JWTAuthMiddleware(), bookService.CreateBook)
+			booksRouter.PUT("/:bookId", middlewares.JWTAuthMiddleware(), bookService.UpdateBook)
+			booksRouter.DELETE("/:bookId", middlewares.JWTAuthMiddleware(), bookService.DeleteBook)
 		}
 	}
 }

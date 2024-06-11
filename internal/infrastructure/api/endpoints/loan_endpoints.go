@@ -10,18 +10,18 @@ import (
 // Loan sets up the loan endpoints on the given gin router.
 //
 // Parameters:
-// - r: a pointer to a gin.Engine representing the router.
+// - router: a pointer to a gin.Engine representing the router.
 // - loanService: a pointer to a loan.LoanService representing the loan service.
 //
 // Return type: None.
-func Loan(r *gin.Engine, loanService *loan.LoanService) {
-	v1 := r.Group("/api/v1")
+func Loan(router *gin.Engine, loanService *loan.LoanService) {
+	v1 := router.Group("/v1")
 	{
 		loansRouter := v1.Group("/loans")
 		{
-			loansRouter.POST("/", middlewares.RequireAuth, loanService.CreateLoan)
-			loansRouter.GET("/", middlewares.RequireAuth, loanService.GetAllLoans)
-			loansRouter.PUT("/:loanId/return", middlewares.RequireAuth, loanService.ReturnLoan)
+			loansRouter.POST("/", middlewares.JWTAuthMiddleware(), loanService.CreateLoan)
+			loansRouter.GET("/", middlewares.JWTAuthMiddleware(), loanService.GetAllLoans)
+			loansRouter.PUT("/:loanId/return", middlewares.JWTAuthMiddleware(), loanService.ReturnLoan)
 		}
 	}
 }

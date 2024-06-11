@@ -47,7 +47,7 @@ func StartServer() error {
 	}
 
 	router := gin.Default()
-	docs.SwaggerInfo.BasePath = "/api/v1"
+	docs.SwaggerInfo.BasePath = "/v1"
 
 	// Middleware
 	router.Use(gin.Logger())

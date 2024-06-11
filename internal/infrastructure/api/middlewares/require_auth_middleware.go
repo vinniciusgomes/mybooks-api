@@ -14,7 +14,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// RequireAuth is a middleware function that checks if the incoming request is authenticated.
+// JWTAuthMiddleware is a middleware function that checks if the incoming request is authenticated.
 //
 // It first retrieves the JWT token from a cookie named "auth" in the request.
 // If the token is not found or invalid, it aborts the request with a 401 Unauthorized status.
@@ -32,64 +32,66 @@ import (
 // This struct is attached to the request context.
 //
 // The next handler in the chain is called.
-func RequireAuth(c *gin.Context) {
-	// Retrieve the token string from the cookie
-	tokenString, err := c.Cookie(helper.AuthCookieName)
-	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
-	// Parse the JWT token
-	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Ensure the signing method is HMAC
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+func JWTAuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Retrieve the token string from the cookie
+		tokenString, err := c.Cookie(helper.AuthCookieName)
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
 		}
-		return []byte(os.Getenv("JWT_SECRET")), nil
-	})
-	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
+
+		// Parse the JWT token
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			// Ensure the signing method is HMAC
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			return []byte(os.Getenv("JWT_SECRET")), nil
+		})
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		// Check if token is valid and extract claims
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok || !token.Valid {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		// Check if token has expired
+		if float64(time.Now().Unix()) > claims["exp"].(float64) {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		// Parse the user ID from the token claims
+		userID, err := uuid.Parse(claims["sub"].(string))
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		// Use the authentication repository to get the user
+		repo := authentication.NewAuthenticationRepository(config.DB())
+		user, err := repo.GetUserByID(userID.String())
+		if err != nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		// Check if user ID is zero value of uuid.UUID
+		if user.ID == uuid.Nil {
+			c.AbortWithStatus(http.StatusUnauthorized)
+			return
+		}
+
+		// Attach the public user to the context
+		c.Set("user", user)
+
+		// Continue with the next handler
+		c.Next()
 	}
-
-	// Check if token is valid and extract claims
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
-	// Check if token has expired
-	if float64(time.Now().Unix()) > claims["exp"].(float64) {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
-	// Parse the user ID from the token claims
-	userID, err := uuid.Parse(claims["sub"].(string))
-	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
-	// Use the authentication repository to get the user
-	repo := authentication.NewAuthenticationRepository(config.DB())
-	user, err := repo.GetUserByID(userID.String())
-	if err != nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
-	// Check if user ID is zero value of uuid.UUID
-	if user.ID == uuid.Nil {
-		c.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
-
-	// Attach the public user to the context
-	c.Set("user", user)
-
-	// Continue with the next handler
-	c.Next()
 }

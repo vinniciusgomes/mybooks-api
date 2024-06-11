@@ -15,13 +15,13 @@ import (
 //
 // Returns: None.
 func Authentication(router *gin.Engine, authService *authentication.AuthenticationService) {
-	v1 := router.Group("/api/v1")
+	v1 := router.Group("/v1")
 	{
 		authRouter := v1.Group("/auth")
 		{
 			authRouter.POST("/signup/credentials", authService.CreateUserWithCredentials)
 			authRouter.POST("/signin/credentials", authService.SignInWithCredentials)
-			authRouter.GET("/validate", middlewares.RequireAuth, authService.ValidateToken)
+			authRouter.GET("/validate", middlewares.JWTAuthMiddleware(), authService.ValidateToken)
 		}
 	}
 }

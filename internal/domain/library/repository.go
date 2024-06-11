@@ -16,6 +16,7 @@ type LibraryRepository interface {
 	UpdateLibrary(userID string, library *model.Library) error
 	DeleteLibrary(userID, id string) error
 	AddBookToLibrary(userID, libraryID, bookID string) error
+	RemoveBookFromLibrary(userID, libraryID, bookID string) error
 }
 
 type libraryRepositoryImp struct {
@@ -98,7 +99,6 @@ func (r *libraryRepositoryImp) GetLibraryByID(userID, id string) (*model.Library
 //
 // Returns:
 // - error: an error object if there was an issue deleting the library.
-
 func (r *libraryRepositoryImp) DeleteLibrary(userID, id string) error {
 	tx := r.db.Begin()
 	defer func() {
@@ -109,7 +109,7 @@ func (r *libraryRepositoryImp) DeleteLibrary(userID, id string) error {
 	}()
 
 	// Delete the relation in the book_library table
-	if err := r.db.Exec("DELETE FROM book_library WHERE library_id = ?", id).Error; err != nil {
+	if err := tx.Exec("DELETE FROM book_library WHERE library_id = ?", id).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -169,30 +169,97 @@ func (r *libraryRepositoryImp) AddBookToLibrary(userID, libraryID, bookID string
 		return err
 	}
 
-	return r.db.Transaction(func(tx *gorm.DB) error {
-		var library model.Library
-		err := tx.First(&library, "id = ? AND user_id = ?", libUUID, userID).Error
-		if err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return fmt.Errorf("library not found")
-			}
+	tx := r.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			panic(r) // Re-throw panic after Rollback
+		}
+	}()
 
-			return err
+	var library model.Library
+	err = tx.First(&library, "id = ? AND user_id = ?", libUUID, userID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("library not found")
+		}
+		tx.Rollback()
+		return err
+	}
+
+	var book model.Book
+	err = tx.First(&book, "id = ? AND user_id = ?", bookUUID, userID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("book not found")
 		}
 
-		var book model.Book
-		err = tx.First(&book, "id = ? AND user_id = ?", bookUUID, userID).Error
-		if err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				return fmt.Errorf("book not found")
-			}
-			return err
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Model(&library).Association("Books").Append(&book); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
+}
+
+// RemoveBookFromLibrary removes a book from a library in the library repository.
+//
+// Parameters:
+// - userID: a string representing the ID of the user.
+// - libraryID: a string representing the ID of the library.
+// - bookID: a string representing the ID of the book.
+//
+// Returns:
+// - error: an error object if there was an issue removing the book from the library.
+func (r *libraryRepositoryImp) RemoveBookFromLibrary(userID, libraryID, bookID string) error {
+	libUUID, err := uuid.Parse(libraryID)
+	if err != nil {
+		return err
+	}
+
+	bookUUID, err := uuid.Parse(bookID)
+	if err != nil {
+		return err
+	}
+
+	tx := r.db.Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+			panic(r) // Re-throw panic after Rollback
+		}
+	}()
+
+	var library model.Library
+	err = tx.First(&library, "id = ? AND user_id = ?", libUUID, userID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("library not found")
 		}
 
-		if err := tx.Model(&library).Association("Books").Append(&book); err != nil {
-			return err
+		tx.Rollback()
+		return err
+	}
+
+	var book model.Book
+	err = tx.First(&book, "id = ? AND user_id = ?", bookUUID, userID).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("book not found")
 		}
 
-		return nil
-	})
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Model(&library).Association("Books").Delete(&book); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit().Error
 }

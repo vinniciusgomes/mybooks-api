@@ -21,6 +21,7 @@ func Authentication(router *gin.Engine, authService *authentication.Authenticati
 		{
 			authRouter.POST("/signup/credentials", authService.CreateUserWithCredentials)
 			authRouter.POST("/signin/credentials", authService.SignInWithCredentials)
+			authRouter.POST("/signout", authService.SignOut)
 			authRouter.GET("/validate", middlewares.JWTAuthMiddleware(), authService.ValidateToken)
 		}
 	}

@@ -9,6 +9,7 @@ Authentication is required for most endpoints. MyBooks supports credentials auth
 #### Endpoints:
 - `POST v1/auth/signup/credentials`: Create user with credentials.
 - `POST v1/auth/signin/credentials`: Authentication user with credentials.
+- `POST v1/auth/signout`: Logout user. 
 - `GET v1/auth/validate`: Validate access_token cookie.
 
 ### Libraries
@@ -20,7 +21,8 @@ Manage libraries where users can organize their books.
 - `POST v1/libraries`: Create a new library.
 - `PUT v1/libraries/{libraryId}`: Update a library.
 - `DELETE v1/libraries/{libraryId}`: Delete a library.
-- `POST v1/libraries/{libraryId}/books`: Add books to a library.
+- `POST v1/libraries/{libraryId}/books/{bookId}`: Add book to a library.
+- `DELETE v1/libraries/{libraryId}/books/{bookId}`: Remove book from a library.
 
 ### Books
 Manage books within libraries.
@@ -60,6 +62,7 @@ Manage loan status of books.
 ### Authentication
 
 - [X] Should be able to authenticate using credentials;
+- [X] Should be able to logout;
 - [ ] Should be able to refresh token;
 - [ ] Should be able to authenticate using Google account;
 
@@ -70,7 +73,8 @@ Manage loan status of books.
 - [X] Should be able to get a library by id;
 - [X] Should be able to update a library;
 - [X] Should be able to delete a library;
-- [X] Should be able to add books in a library;
+- [X] Should be able to add book in a library;
+- [X] Should be able to remove book from a library;
 
 ### Books ✅
 

@@ -16,10 +16,6 @@ type LibraryService struct {
 	repo LibraryRepository
 }
 
-type AddBookRequest struct {
-	BookID string `json:"book_id"`
-}
-
 type LibraryResponse struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
@@ -229,16 +225,16 @@ func (s *LibraryService) UpdateLibrary(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-// AddBookToLibrary adds a book to a library in the LibraryService.
+// AddBookToLibrary adds a book to a library.
 //
 // It takes a pointer to a gin.Context as a parameter and returns nothing.
-// The function retrieves the library ID from the request parameter,
-// binds the JSON request body to an AddBookRequest struct,
-// retrieves the book ID from the request body,
+// The function retrieves the library ID and book ID from the request parameters,
+// retrieves the user ID from the context,
 // adds the book to the library in the repository,
 // and returns an HTTP status code indicating the success of the operation.
 func (s *LibraryService) AddBookToLibrary(c *gin.Context) {
 	libraryID := c.Param("libraryId")
+	bookID := c.Param("bookId")
 
 	user, err := helper.GetUserFromContext(c)
 	if err != nil {
@@ -247,16 +243,33 @@ func (s *LibraryService) AddBookToLibrary(c *gin.Context) {
 	}
 	userID := user.ID
 
-	var req AddBookRequest
-
-	if err := c.BindJSON(&req); err != nil {
-		helper.HandleError(c, err, http.StatusBadRequest)
+	if err := s.repo.AddBookToLibrary(userID.String(), libraryID, bookID); err != nil {
+		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
-	bookID := req.BookID
+	c.Status(http.StatusOK)
+}
 
-	if err := s.repo.AddBookToLibrary(userID.String(), libraryID, bookID); err != nil {
+// RemoveBookFromLibrary removes a book from a library in the LibraryService.
+//
+// It takes a pointer to a gin.Context as a parameter and returns nothing.
+// The function retrieves the library ID and book ID from the request parameters,
+// retrieves the user ID from the context,
+// removes the book from the library in the repository,
+// and returns an HTTP status code indicating the success of the operation.
+func (s *LibraryService) RemoveBookFromLibrary(c *gin.Context) {
+	libraryID := c.Param("libraryId")
+	bookID := c.Param("bookId")
+
+	user, err := helper.GetUserFromContext(c)
+	if err != nil {
+		helper.HandleError(c, err, http.StatusUnauthorized)
+		return
+	}
+	userID := user.ID
+
+	if err := s.repo.RemoveBookFromLibrary(userID.String(), libraryID, bookID); err != nil {
 		helper.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}

@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"mybooks/internal/infrastructure/model"
 	"os"
 
@@ -19,14 +18,14 @@ var e error
 // This function does not take any parameters.
 // It does not return any values.
 func DatabaseInit() {
-	host := os.Getenv("DB_HOST")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
-	port := os.Getenv("DB_PORT")
+	// host := os.Getenv("DB_HOST")
+	// user := os.Getenv("DB_USER")
+	// password := os.Getenv("DB_PASSWORD")
+	// dbName := os.Getenv("DB_NAME")
+	// port := os.Getenv("DB_PORT")
 
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, password, dbName, port)
-	database, e = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	// dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", host, user, password, dbName, port)
+	database, e = gorm.Open(postgres.Open(os.Getenv("DATABASE_URL")), &gorm.Config{})
 
 	if e != nil {
 		panic(e)

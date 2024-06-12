@@ -15,19 +15,10 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o myapp ./cmd/api
 
 # Stage 2: Final stage
-FROM alpine:latest
-
-# Install necessary packages (if needed)
-RUN apk --no-cache add ca-certificates
-
-# Set the working directory
-WORKDIR /app
+FROM scratch
 
 # Copy the binary from the build stage
-COPY --from=build /app/myapp .
-
-# Ensure the binary is executable
-RUN chmod +x /app/myapp
+COPY --from=build /app/myapp /app/myapp
 
 # Set the entrypoint command
 ENTRYPOINT ["/app/myapp"]

@@ -3,6 +3,68 @@
 ### Introduction
 Welcome to the documentation for the MyBooks API. MyBooks is a SaaS project designed to help users organize their personal library. This API provides endpoints for managing libraries, books, user profiles, billing, and loan status.
 
+## File structure
+```
+/myapp
+|-- /api
+|   |-- main.go
+|   |-- swagger.json
+|   |-- swagger.yaml
+|   |
+|-- /cmd
+|   |-- /api
+|   |   |-- main.go
+|   |
+|-- /internal
+|   |-- /domain
+|   |   |-- /authentication
+|   |   |   |-- repository.go
+|   |   |   |-- service.go
+|   |   |-- /book
+|   |   |   |-- repository.go
+|   |   |   |-- service.go
+|   |   |-- /library
+|   |   |   |-- repository.go
+|   |   |   |-- service.go
+|   |   |-- /loan
+|   |   |   |-- repository.go
+|   |   |   |-- service.go
+|   |
+|   |-- /infrastructure
+|   |   |-- /api
+|   |   |   |-- /endpoints
+|   |   |   |   |-- auth_endpoints.go
+|   |   |   |   |-- books_endpoints.go
+|   |   |   |   |-- library_endpoints.go
+|   |   |   |   |-- loans_endpoints.go
+|   |   |   |-- /middlewares
+|   |   |   |   |-- cors_middleware.go
+|   |   |   |   |-- require_auth_middleware.go
+|   |   |   |-- server.go
+|   |   |-- /config
+|   |   |   |-- db.go
+|   |   |-- /helper
+|   |   |   |-- constants.go
+|   |   |   |-- get_user_from_context.go
+|   |   |   |-- handle_error.go
+|   |   |-- /model
+|   |   |   |-- book_model.go
+|   |   |   |-- library_model.go
+|   |   |   |-- loan_model.go
+|   |   |   |-- user_model.go
+|   |
+|-- /pkg
+|   |-- generate_random_id.go
+|   |-- validate_model_struct.go
+|
+|-- Dockerfile
+|-- docker-compose.yml
+|-- go.mod
+|-- go.sum
+|-- makefile
+```
+
+## Features
 ### Authentication
 Authentication is required for most endpoints. MyBooks supports credentials authentication and authentication via Google account.
 
@@ -57,7 +119,7 @@ Manage loan status of books.
 - `GET v1/loans`: Get all loans
 - `PUT v1/loans/:loanId/return`: Mark loan as returned
 
-## Features roadmap
+## Roadmap
 
 ### Authentication
 

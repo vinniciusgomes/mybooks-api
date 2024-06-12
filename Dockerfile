@@ -15,7 +15,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o myapp ./cmd/api
 
 # Stage 2: Final stage
-FROM alpine:latest
+FROM scratch
 
 # Install necessary packages (if needed)
 RUN apk --no-cache add ca-certificates

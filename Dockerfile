@@ -1,6 +1,5 @@
-# syntax=docker/dockerfile:1
-
-FROM golang:1.21.0
+# Stage 1: Build stage
+FROM golang:1.22.3-alpine AS build
 
 # Set destination for COPY
 WORKDIR /app
@@ -12,15 +11,17 @@ RUN go mod download
 # Copy the entire project directory
 COPY . .
 
-# Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping ./cmd/api
+# Build the Go application
+RUN CGO_ENABLED=0 GOOS=linux go build -o myapp ./cmd/api
 
-# Optional:
-# To bind to a TCP port, runtime parameters must be supplied to the docker command.
-# But we can document in the Dockerfile what ports
-# the application is going to listen on by default.
-# https://docs.docker.com/engine/reference/builder/#expose
-EXPOSE 8080
+# Stage 2: Final stage
+FROM scratch
 
-# Run
-CMD ["/docker-gs-ping"]
+# Set the working directory
+WORKDIR /app
+
+# Copy the binary from the build stage
+COPY --from=build /app/myapp .
+
+# Set the entrypoint command
+ENTRYPOINT ["/app/myapp"]

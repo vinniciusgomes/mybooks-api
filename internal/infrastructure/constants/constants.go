@@ -1,4 +1,4 @@
-package helper
+package constants
 
 const (
 	// ApiVersion represents the version of the API.

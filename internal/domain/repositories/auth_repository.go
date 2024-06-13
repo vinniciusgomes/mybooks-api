@@ -1,29 +1,29 @@
-package authentication
+package repositories
 
 import (
 	"errors"
 	"fmt"
-	"mybooks/internal/infrastructure/model"
+	"mybooks/internal/domain/models"
 
 	"gorm.io/gorm"
 )
 
-type AuthenticationRepository interface {
-	CreateUser(user *model.User) error
-	GetUserByEmail(email string) (*model.User, error)
-	GetUserByID(id string) (*model.User, error)
+type AuthRepository interface {
+	CreateUser(user *models.User) error
+	GetUserByEmail(email string) (*models.User, error)
+	GetUserByID(id string) (*models.User, error)
 }
 
-type authenticationRepositoryImp struct {
+type authRepositoryImp struct {
 	db *gorm.DB
 }
 
-// NewAuthenticationRepository creates a new instance of the AuthenticationRepository interface.
+// NewAuthRepository creates a new instance of the AuthRepository interface.
 //
 // It takes a *gorm.DB parameter, which represents the database connection.
-// It returns an AuthenticationRepository pointer, which is an implementation of the AuthenticationRepository interface.
-func NewAuthenticationRepository(db *gorm.DB) AuthenticationRepository {
-	return &authenticationRepositoryImp{
+// It returns an AuthRepository pointer, which is an implementation of the AuthRepository interface.
+func NewAuthRepository(db *gorm.DB) AuthRepository {
+	return &authRepositoryImp{
 		db: db,
 	}
 }
@@ -34,7 +34,7 @@ func NewAuthenticationRepository(db *gorm.DB) AuthenticationRepository {
 // The function creates a new record in the database using the provided User object.
 // If there is an error during the creation process, it returns the error.
 // Otherwise, it returns nil.
-func (r *authenticationRepositoryImp) CreateUser(user *model.User) error {
+func (r *authRepositoryImp) CreateUser(user *models.User) error {
 	if err := r.db.Create(user).Error; err != nil {
 		if errors.Is(err, gorm.ErrDuplicatedKey) {
 			return fmt.Errorf("user with email %s already exists", user.Email)
@@ -52,9 +52,9 @@ func (r *authenticationRepositoryImp) CreateUser(user *model.User) error {
 // - email: a string representing the email of the user.
 //
 // Returns:
-// - *model.User
-func (r *authenticationRepositoryImp) GetUserByEmail(email string) (*model.User, error) {
-	var user model.User
+// - *models.User
+func (r *authRepositoryImp) GetUserByEmail(email string) (*models.User, error) {
+	var user models.User
 
 	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
 		return nil, err
@@ -69,9 +69,9 @@ func (r *authenticationRepositoryImp) GetUserByEmail(email string) (*model.User,
 // - id: a string representing the ID of the user.
 //
 // Returns:
-// - *model.User
-func (r *authenticationRepositoryImp) GetUserByID(id string) (*model.User, error) {
-	var user model.User
+// - *models.User
+func (r *authRepositoryImp) GetUserByID(id string) (*models.User, error) {
+	var user models.User
 
 	if err := r.db.Where("id = ?", id).First(&user).Error; err != nil {
 		return nil, err

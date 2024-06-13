@@ -6,52 +6,51 @@ Welcome to the documentation for the MyBooks API. MyBooks is a SaaS project desi
 ## File structure
 ```
 /myapp
-|-- /api
-|   |-- main.go
-|   |-- swagger.json
-|   |-- swagger.yaml
-|   |
 |-- /cmd
 |   |-- /api
 |   |   |-- main.go
 |   |
+|-- /docs
+|   |-- main.go
+|   |-- swagger.json
+|   |-- swagger.yaml
+|   |
 |-- /internal
 |   |-- /domain
-|   |   |-- /authentication
-|   |   |   |-- repository.go
-|   |   |   |-- service.go
-|   |   |-- /book
-|   |   |   |-- repository.go
-|   |   |   |-- service.go
-|   |   |-- /library
-|   |   |   |-- repository.go
-|   |   |   |-- service.go
-|   |   |-- /loan
-|   |   |   |-- repository.go
-|   |   |   |-- service.go
-|   |
-|   |-- /infrastructure
-|   |   |-- /api
-|   |   |   |-- /endpoints
-|   |   |   |   |-- auth_endpoints.go
-|   |   |   |   |-- books_endpoints.go
-|   |   |   |   |-- library_endpoints.go
-|   |   |   |   |-- loans_endpoints.go
-|   |   |   |-- /middlewares
-|   |   |   |   |-- cors_middleware.go
-|   |   |   |   |-- require_auth_middleware.go
-|   |   |   |-- server.go
-|   |   |-- /config
-|   |   |   |-- db.go
-|   |   |-- /helper
-|   |   |   |-- constants.go
-|   |   |   |-- get_user_from_context.go
-|   |   |   |-- handle_error.go
-|   |   |-- /model
+|   |   |-- /models
 |   |   |   |-- book_model.go
 |   |   |   |-- library_model.go
 |   |   |   |-- loan_model.go
 |   |   |   |-- user_model.go
+|   |   |-- /repositories
+|   |   |   |-- auth_repository.go
+|   |   |   |-- book_repository.go
+|   |   |   |-- library_repository.go
+|   |   |   |-- loan_repository.go
+|   |   |-- /services
+|   |   |   |-- auth_service.go
+|   |   |   |-- book_service.go
+|   |   |   |-- library_service.go
+|   |   |   |-- loan_service.go
+|   |
+|   |-- /infrastructure
+|   |   |-- /api
+|   |   |   |-- /handlers
+|   |   |   |   |-- auth_handler.go
+|   |   |   |   |-- books_handler.go
+|   |   |   |   |-- library_handler.go
+|   |   |   |   |-- loans_handler.go
+|   |   |   |-- /middlewares
+|   |   |   |   |-- auth_middleware.go
+|   |   |   |   |-- cors_middleware.go
+|   |   |   |-- server.go
+|   |   |-- /config
+|   |   |   |-- database.go
+|   |   |-- /constants
+|   |   |   |-- constants.go
+|   |   |-- /helpers
+|   |   |   |-- get_user_from_context.go
+|   |   |   |-- handle_error.go
 |   |
 |-- /pkg
 |   |-- generate_random_id.go

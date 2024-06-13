@@ -2,17 +2,15 @@ package api
 
 import (
 	"log"
-	"mybooks/internal/domain/authentication"
-	"mybooks/internal/domain/book"
-	"mybooks/internal/domain/library"
-	"mybooks/internal/domain/loan"
-	"mybooks/internal/infrastructure/api/endpoints"
+	"mybooks/internal/domain/repositories"
+	"mybooks/internal/domain/services"
+	"mybooks/internal/infrastructure/api/handlers"
 	"mybooks/internal/infrastructure/api/middlewares"
 	"mybooks/internal/infrastructure/config"
 	"net/http"
 	"os"
 
-	docs "mybooks/api"
+	"mybooks/docs"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -31,8 +29,8 @@ import (
 // It creates a new book service using the book repository and the database
 // connection.
 // It registers the authentication, libraries, books, profile, billing, loan, and
-// reading endpoints with the Gin instance.
-// It adds a health check endpoint that returns "OK" with a status code of 200.
+// reading handlers with the Gin instance.
+// It adds a health check handler that returns "OK" with a status code of 200.
 // It gets the HTTP port from the environment variable or sets it to "8080" if
 // it is not set.
 // It starts the server and returns any error that occurs.
@@ -68,16 +66,16 @@ func StartServer() error {
 	}
 
 	// Services
-	authService := authentication.NewAuthenticationService(authentication.NewAuthenticationRepository(config.DB()))
-	bookService := book.NewBookService(book.NewBookRepository(config.DB()))
-	libraryService := library.NewLibraryService(library.NewLibraryRepository(config.DB()))
-	loanService := loan.NewLoanService(loan.NewLoanRepository(config.DB()))
+	authService := services.NewAuthService(repositories.NewAuthRepository(config.DB()))
+	bookService := services.NewBookService(repositories.NewBookRepository(config.DB()))
+	libraryService := services.NewLibraryService(repositories.NewLibraryRepository(config.DB()))
+	loanService := services.NewLoanService(repositories.NewLoanRepository(config.DB()))
 
 	// Routes
-	endpoints.Authentication(router, authService)
-	endpoints.Libraries(router, libraryService)
-	endpoints.Books(router, bookService)
-	endpoints.Loan(router, loanService)
+	handlers.AuthHandler(router, authService)
+	handlers.LibrariesHandler(router, libraryService)
+	handlers.BooksHandler(router, bookService)
+	handlers.LoanHandler(router, loanService)
 
 	// Others routes
 	router.GET("/v1/health", func(c *gin.Context) {

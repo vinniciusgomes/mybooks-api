@@ -1,8 +1,9 @@
-package library
+package services
 
 import (
-	"mybooks/internal/infrastructure/helper"
-	"mybooks/internal/infrastructure/model"
+	"mybooks/internal/domain/models"
+	"mybooks/internal/domain/repositories"
+	"mybooks/internal/infrastructure/helpers"
 	"mybooks/pkg"
 	"net/http"
 	"strings"
@@ -13,7 +14,7 @@ import (
 )
 
 type LibraryService struct {
-	repo LibraryRepository
+	repo repositories.LibraryRepository
 }
 
 type LibraryResponse struct {
@@ -31,7 +32,7 @@ type LibraryResponse struct {
 //
 // Returns:
 // - *LibraryService: A pointer to the newly created LibraryService instance.
-func NewLibraryService(repo LibraryRepository) *LibraryService {
+func NewLibraryService(repo repositories.LibraryRepository) *LibraryService {
 	return &LibraryService{
 		repo: repo,
 	}
@@ -43,22 +44,22 @@ func NewLibraryService(repo LibraryRepository) *LibraryService {
 // The function generates a random ID, binds the JSON request body to a Library struct,
 // validates the struct, creates the library in the repository, and returns the ID of the created library.
 func (s *LibraryService) CreateLibrary(c *gin.Context) {
-	library := new(model.Library)
+	library := new(models.Library)
 
-	user, err := helper.GetUserFromContext(c)
+	user, err := helpers.GetUserFromContext(c)
 	if err != nil {
-		helper.HandleError(c, err, http.StatusUnauthorized)
+		helpers.HandleError(c, err, http.StatusUnauthorized)
 		return
 	}
 
 	id, err := pkg.GenerateRandomID()
 	if err != nil {
-		helper.HandleError(c, err, http.StatusInternalServerError)
+		helpers.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
 	if err := c.BindJSON(library); err != nil {
-		helper.HandleError(c, err, http.StatusBadRequest)
+		helpers.HandleError(c, err, http.StatusBadRequest)
 		return
 	}
 
@@ -67,12 +68,12 @@ func (s *LibraryService) CreateLibrary(c *gin.Context) {
 	library.User = *user
 
 	if err := pkg.ValidateModelStruct(library); err != nil {
-		helper.HandleError(c, err, http.StatusUnprocessableEntity)
+		helpers.HandleError(c, err, http.StatusUnprocessableEntity)
 		return
 	}
 
 	if err := s.repo.CreateLibrary(library); err != nil {
-		helper.HandleError(c, err, http.StatusInternalServerError)
+		helpers.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -91,16 +92,16 @@ func (s *LibraryService) CreateLibrary(c *gin.Context) {
 // Returns:
 // - None
 func (s *LibraryService) GetAllLibraries(c *gin.Context) {
-	user, err := helper.GetUserFromContext(c)
+	user, err := helpers.GetUserFromContext(c)
 	if err != nil {
-		helper.HandleError(c, err, http.StatusUnauthorized)
+		helpers.HandleError(c, err, http.StatusUnauthorized)
 		return
 	}
 	userID := user.ID
 
 	libraries, err := s.repo.GetAllLibraries(userID.String())
 	if err != nil {
-		helper.HandleError(c, err, http.StatusInternalServerError)
+		helpers.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -128,9 +129,9 @@ func (s *LibraryService) GetAllLibraries(c *gin.Context) {
 func (s *LibraryService) GetLibraryByID(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 
-	user, err := helper.GetUserFromContext(c)
+	user, err := helpers.GetUserFromContext(c)
 	if err != nil {
-		helper.HandleError(c, err, http.StatusUnauthorized)
+		helpers.HandleError(c, err, http.StatusUnauthorized)
 		return
 	}
 	userID := user.ID
@@ -138,11 +139,11 @@ func (s *LibraryService) GetLibraryByID(c *gin.Context) {
 	library, err := s.repo.GetLibraryByID(userID.String(), libraryID)
 	if err != nil {
 		if strings.Contains(err.Error(), "library not found") {
-			helper.HandleError(c, err, http.StatusNotFound)
+			helpers.HandleError(c, err, http.StatusNotFound)
 			return
 		}
 
-		helper.HandleError(c, err, http.StatusInternalServerError)
+		helpers.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -159,20 +160,20 @@ func (s *LibraryService) GetLibraryByID(c *gin.Context) {
 func (s *LibraryService) DeleteLibrary(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 
-	user, err := helper.GetUserFromContext(c)
+	user, err := helpers.GetUserFromContext(c)
 	if err != nil {
-		helper.HandleError(c, err, http.StatusUnauthorized)
+		helpers.HandleError(c, err, http.StatusUnauthorized)
 		return
 	}
 	userID := user.ID
 
 	if err := s.repo.DeleteLibrary(userID.String(), libraryID); err != nil {
 		if strings.Contains(err.Error(), "library not found") {
-			helper.HandleError(c, err, http.StatusNotFound)
+			helpers.HandleError(c, err, http.StatusNotFound)
 			return
 		}
 
-		helper.HandleError(c, err, http.StatusInternalServerError)
+		helpers.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -190,22 +191,22 @@ func (s *LibraryService) DeleteLibrary(c *gin.Context) {
 func (s *LibraryService) UpdateLibrary(c *gin.Context) {
 	id := c.Param("libraryId")
 
-	user, err := helper.GetUserFromContext(c)
+	user, err := helpers.GetUserFromContext(c)
 	if err != nil {
-		helper.HandleError(c, err, http.StatusUnauthorized)
+		helpers.HandleError(c, err, http.StatusUnauthorized)
 		return
 	}
 	userID := user.ID
 
-	var library model.Library
+	var library models.Library
 	if err := c.BindJSON(&library); err != nil {
-		helper.HandleError(c, err, http.StatusBadRequest)
+		helpers.HandleError(c, err, http.StatusBadRequest)
 		return
 	}
 
 	libraryID, err := uuid.Parse(id)
 	if err != nil {
-		helper.HandleError(c, err, http.StatusBadRequest)
+		helpers.HandleError(c, err, http.StatusBadRequest)
 		return
 	}
 
@@ -213,12 +214,12 @@ func (s *LibraryService) UpdateLibrary(c *gin.Context) {
 	library.User = *user
 
 	if err := pkg.ValidateModelStruct(library); err != nil {
-		helper.HandleError(c, err, http.StatusUnprocessableEntity)
+		helpers.HandleError(c, err, http.StatusUnprocessableEntity)
 		return
 	}
 
 	if err := s.repo.UpdateLibrary(userID.String(), &library); err != nil {
-		helper.HandleError(c, err, http.StatusInternalServerError)
+		helpers.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -236,15 +237,15 @@ func (s *LibraryService) AddBookToLibrary(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 	bookID := c.Param("bookId")
 
-	user, err := helper.GetUserFromContext(c)
+	user, err := helpers.GetUserFromContext(c)
 	if err != nil {
-		helper.HandleError(c, err, http.StatusUnauthorized)
+		helpers.HandleError(c, err, http.StatusUnauthorized)
 		return
 	}
 	userID := user.ID
 
 	if err := s.repo.AddBookToLibrary(userID.String(), libraryID, bookID); err != nil {
-		helper.HandleError(c, err, http.StatusInternalServerError)
+		helpers.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 
@@ -262,15 +263,15 @@ func (s *LibraryService) RemoveBookFromLibrary(c *gin.Context) {
 	libraryID := c.Param("libraryId")
 	bookID := c.Param("bookId")
 
-	user, err := helper.GetUserFromContext(c)
+	user, err := helpers.GetUserFromContext(c)
 	if err != nil {
-		helper.HandleError(c, err, http.StatusUnauthorized)
+		helpers.HandleError(c, err, http.StatusUnauthorized)
 		return
 	}
 	userID := user.ID
 
 	if err := s.repo.RemoveBookFromLibrary(userID.String(), libraryID, bookID); err != nil {
-		helper.HandleError(c, err, http.StatusInternalServerError)
+		helpers.HandleError(c, err, http.StatusInternalServerError)
 		return
 	}
 

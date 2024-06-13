@@ -1,19 +1,19 @@
-package book
+package repositories
 
 import (
 	"errors"
 	"fmt"
-	"mybooks/internal/infrastructure/model"
+	"mybooks/internal/domain/models"
 
 	"gorm.io/gorm"
 )
 
 type BookRepository interface {
-	CreateBook(book *model.Book) error
-	GetAllBooks(userID string, filters map[string]interface{}) (*[]model.Book, error)
-	GetBookById(userID string, id string) (*model.Book, error)
+	CreateBook(book *models.Book) error
+	GetAllBooks(userID string, filters map[string]interface{}) (*[]models.Book, error)
+	GetBookById(userID string, id string) (*models.Book, error)
 	DeleteBook(userID string, id string) error
-	UpdateBook(userID string, book *model.Book) error
+	UpdateBook(userID string, book *models.Book) error
 }
 
 type bookRepositoryImp struct {
@@ -36,7 +36,7 @@ func NewBookRepository(db *gorm.DB) BookRepository {
 // The function creates a new record in the database using the provided book object.
 // If there is an error during the creation process, it returns the error.
 // Otherwise, it returns nil.
-func (r *bookRepositoryImp) CreateBook(book *model.Book) error {
+func (r *bookRepositoryImp) CreateBook(book *models.Book) error {
 	if err := r.db.Create(book).Error; err != nil {
 		return err
 	}
@@ -48,13 +48,13 @@ func (r *bookRepositoryImp) CreateBook(book *model.Book) error {
 //
 // The function takes a userID string and a map of key-value pairs representing the filters to be applied.
 // The keys represent the fields to be filtered, and the values represent the values to match against.
-// The function returns a pointer to a slice of model.Book objects representing the retrieved books,
+// The function returns a pointer to a slice of models.Book objects representing the retrieved books,
 // and an error if there was an issue retrieving the books.
 // If there is an error during the retrieval process, the function returns nil and the error.
 // The books are ordered by the creation date in descending order.
-func (r *bookRepositoryImp) GetAllBooks(userID string, filters map[string]interface{}) (*[]model.Book, error) {
-	var books []model.Book
-	query := r.db.Model(&model.Book{}).Where("user_id = ?", userID).Omit("libraries")
+func (r *bookRepositoryImp) GetAllBooks(userID string, filters map[string]interface{}) (*[]models.Book, error) {
+	var books []models.Book
+	query := r.db.Model(&models.Book{}).Where("user_id = ?", userID).Omit("libraries")
 
 	for key, value := range filters {
 		if key == "read" {
@@ -76,11 +76,11 @@ func (r *bookRepositoryImp) GetAllBooks(userID string, filters map[string]interf
 // GetBookById retrieves a book from the bookRepositoryImp by its ID.
 //
 // It takes a string parameter `userID` representing the ID of the user and a string parameter `id` representing the ID of the book to retrieve.
-// The function returns a pointer to a model.Book object representing the retrieved book, and an error if there was an issue retrieving the book.
+// The function returns a pointer to a models.Book object representing the retrieved book, and an error if there was an issue retrieving the book.
 // If the book is not found, it returns nil and an error with the message "book not found".
 // If there is any other error during the retrieval process, it returns nil and the error.
-func (r *bookRepositoryImp) GetBookById(userID, id string) (*model.Book, error) {
-	var book model.Book
+func (r *bookRepositoryImp) GetBookById(userID, id string) (*models.Book, error) {
+	var book models.Book
 	if err := r.db.First(&book, "id = ? AND user_id = ?", id, userID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("book not found")
@@ -115,7 +115,7 @@ func (r *bookRepositoryImp) DeleteBook(userID, id string) error {
 	}
 
 	// Delete the book
-	result := tx.Where("id = ? AND user_id = ?", id, userID).Delete(&model.Book{})
+	result := tx.Where("id = ? AND user_id = ?", id, userID).Delete(&models.Book{})
 	if result.Error != nil {
 		tx.Rollback()
 		return result.Error
@@ -139,12 +139,12 @@ func (r *bookRepositoryImp) DeleteBook(userID, id string) error {
 //
 // Parameters:
 // - userID: a string representing the ID of the user.
-// - book: a pointer to a model.Book object representing the book to be updated.
+// - book: a pointer to a models.Book object representing the book to be updated.
 //
 // Returns:
 // - error: an error object if there was an issue updating the book.
-func (r *bookRepositoryImp) UpdateBook(userID string, book *model.Book) error {
-	result := r.db.Model(&model.Book{}).Omit("ID", "CreatedAt").Where("id = ? AND user_id = ?", book.ID, userID).Updates(book)
+func (r *bookRepositoryImp) UpdateBook(userID string, book *models.Book) error {
+	result := r.db.Model(&models.Book{}).Omit("ID", "CreatedAt").Where("id = ? AND user_id = ?", book.ID, userID).Updates(book)
 
 	if result.Error != nil {
 		return result.Error

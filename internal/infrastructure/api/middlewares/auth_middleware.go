@@ -2,9 +2,9 @@ package middlewares
 
 import (
 	"fmt"
-	"mybooks/internal/domain/authentication"
+	"mybooks/internal/domain/repositories"
 	"mybooks/internal/infrastructure/config"
-	"mybooks/internal/infrastructure/helper"
+	"mybooks/internal/infrastructure/constants"
 	"net/http"
 	"os"
 	"time"
@@ -14,7 +14,7 @@ import (
 	"github.com/google/uuid"
 )
 
-// JWTAuthMiddleware is a middleware function that checks if the incoming request is authenticated.
+// AuthMiddleware is a middleware function that checks if the incoming request is authenticated.
 //
 // It first retrieves the JWT token from a cookie named "auth" in the request.
 // If the token is not found or invalid, it aborts the request with a 401 Unauthorized status.
@@ -32,10 +32,10 @@ import (
 // This struct is attached to the request context.
 //
 // The next handler in the chain is called.
-func JWTAuthMiddleware() gin.HandlerFunc {
+func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Retrieve the token string from the cookie
-		tokenString, err := c.Cookie(helper.AuthCookieName)
+		tokenString, err := c.Cookie(constants.AuthCookieName)
 		if err != nil {
 			c.AbortWithStatus(http.StatusUnauthorized)
 			return
@@ -75,7 +75,7 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 		}
 
 		// Use the authentication repository to get the user
-		repo := authentication.NewAuthenticationRepository(config.DB())
+		repo := repositories.NewAuthRepository(config.DB())
 		user, err := repo.GetUserByID(userID.String())
 		if err != nil {
 			c.AbortWithStatus(http.StatusUnauthorized)

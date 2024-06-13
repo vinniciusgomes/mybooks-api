@@ -1,7 +1,7 @@
 package config
 
 import (
-	"mybooks/internal/infrastructure/model"
+	"mybooks/internal/domain/models"
 	"os"
 
 	"gorm.io/driver/postgres"
@@ -31,7 +31,8 @@ func DatabaseInit() {
 		panic(e)
 	}
 
-	database.AutoMigrate(&model.User{}, &model.Book{}, &model.Library{}, &model.Loan{})
+	// Migrate the schema
+	database.AutoMigrate(&models.User{}, &models.Book{}, &models.Library{}, &models.Loan{})
 }
 
 // DB returns the *gorm.DB object representing the database connection.

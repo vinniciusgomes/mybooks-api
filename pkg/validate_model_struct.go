@@ -57,6 +57,24 @@ func ValidateModelStruct(obj interface{}) error {
 	case "oneof":
 		// Case when the field value should be one of the specified values.
 		return errors.New(field + " must be one of: " + validationError.Param())
+	case "alphanum":
+		// Case when the field should contain only alphanumeric characters.
+		return errors.New(field + " must contain only alphanumeric characters")
+	case "len":
+		// Case when the field should have a specific length.
+		return errors.New(field + " must be exactly " + validationError.Param() + " characters long")
+	case "numeric":
+		// Case when the field should contain only numeric characters.
+		return errors.New(field + " must contain only numeric characters")
+	case "startswith":
+		// Case when the field should start with a specific substring.
+		return errors.New(field + " must start with " + validationError.Param())
+	case "endswith":
+		// Case when the field should end with a specific substring.
+		return errors.New(field + " must end with " + validationError.Param())
+	case "datetime":
+		// Case when the field should be a valid datetime in a specific format.
+		return errors.New(field + " must be a valid datetime in the format " + validationError.Param())
 	default:
 		// Generic case for any other validation errors.
 		return errors.New("Validation error for field: " + field)

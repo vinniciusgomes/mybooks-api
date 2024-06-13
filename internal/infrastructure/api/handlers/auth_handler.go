@@ -22,7 +22,9 @@ func AuthHandler(router *gin.Engine, authService *services.AuthService) {
 			authRouter.POST("/signup/credentials", authService.CreateUserWithCredentials)
 			authRouter.POST("/signin/credentials", authService.SignInWithCredentials)
 			authRouter.POST("/signout", authService.SignOut)
-			authRouter.GET("/validate", middlewares.AuthMiddleware(), authService.ValidateToken)
+			authRouter.POST("/forgot-password", authService.ForgotPassword)
+			authRouter.POST("/reset-password/:token", authService.ResetPassword)
+			authRouter.GET("/validate-token", middlewares.AuthMiddleware(), authService.ValidateAuthToken)
 		}
 	}
 }

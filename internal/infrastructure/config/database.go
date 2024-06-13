@@ -32,7 +32,7 @@ func DatabaseInit() {
 	}
 
 	// Migrate the schema
-	database.AutoMigrate(&models.User{}, &models.Book{}, &models.Library{}, &models.Loan{})
+	database.AutoMigrate(&models.User{}, &models.Book{}, &models.Library{}, &models.Loan{}, &models.ValidationToken{})
 }
 
 // DB returns the *gorm.DB object representing the database connection.

@@ -18,6 +18,7 @@ Welcome to the documentation for the MyBooks API. MyBooks is a SaaS project desi
 |-- /internal
 |   |-- /domain
 |   |   |-- /models
+|   |   |   |-- auth_model.go
 |   |   |   |-- book_model.go
 |   |   |   |-- library_model.go
 |   |   |   |-- loan_model.go
@@ -54,6 +55,7 @@ Welcome to the documentation for the MyBooks API. MyBooks is a SaaS project desi
 |   |
 |-- /pkg
 |   |-- generate_random_id.go
+|   |-- send_email.go
 |   |-- validate_model_struct.go
 |
 |-- Dockerfile
@@ -71,6 +73,8 @@ Authentication is required for most endpoints. MyBooks supports credentials auth
 - `POST v1/auth/signup/credentials`: Create user with credentials.
 - `POST v1/auth/signin/credentials`: Authentication user with credentials.
 - `POST v1/auth/signout`: Logout user. 
+- `POST v1/auth/forgot-password`: Forgot password.
+- `POST v1/auth/reset-password/{token}`: Create a new password.
 - `GET v1/auth/validate`: Validate access_token cookie.
 
 ### Libraries
@@ -124,6 +128,7 @@ Manage loan status of books.
 
 - [X] Should be able to authenticate using credentials;
 - [X] Should be able to logout;
+- [X] Should be able to reset password;
 - [ ] Should be able to refresh token;
 - [ ] Should be able to authenticate using Google account;
 

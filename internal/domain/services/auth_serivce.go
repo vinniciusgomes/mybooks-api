@@ -229,7 +229,7 @@ func (s *AuthService) ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	resetURL := fmt.Sprintf("http://localhost:3000/reset-password/%s", tokenString)
+	resetURL := fmt.Sprintf("%s/reset-password/%s", os.Getenv("APP_URL"), tokenString)
 	err = pkg.SendEmail([]string{user.Email}, "Reset Password", fmt.Sprintf("Click the link to reset your password: <a href='%s' target='_blank'>Reset Password</a>", resetURL))
 	if err != nil {
 		helpers.HandleError(c, err, http.StatusInternalServerError)
